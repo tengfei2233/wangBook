@@ -2,7 +2,7 @@
 ##　后端
 **/.idea
 **/logs
-**/targer
+**/target
 **/*.iml
 
 ## 前端

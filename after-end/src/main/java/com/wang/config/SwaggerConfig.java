@@ -3,12 +3,11 @@ package com.wang.config;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.github.xiaoymin.knife4j.spring.extension.OpenApiExtensionResolver;
 import com.wang.config.properties.SwaggerProperties;
+import com.wang.utils.SpringUtil;
 import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ReflectionUtils;
@@ -37,9 +36,10 @@ import java.util.List;
  */
 
 // 实现BeanFactoryPostProcessor获取beanContext上下文，用于待会手动注册bean
+// TODO 实现BeanFactoryPostProcessor后@PostConstruct无法使用
 @Configuration
 @EnableKnife4j
-public class SwaggerConfig implements BeanFactoryPostProcessor {
+public class SwaggerConfig {
 
 
     @Resource
@@ -47,8 +47,10 @@ public class SwaggerConfig implements BeanFactoryPostProcessor {
     @Resource
     private OpenApiExtensionResolver openApiExtensionResolver;
 
-    private ConfigurableListableBeanFactory beanFactory;
 
+    /**
+     * 用于适配springboot 2.6
+     */
     @Bean
     public BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
         return new BeanPostProcessor() {
@@ -61,7 +63,6 @@ public class SwaggerConfig implements BeanFactoryPostProcessor {
             }
 
             private <T extends RequestMappingInfoHandlerMapping> void customizeSpringfoxHandlerMappings(List<T> mappings) {
-                // removeIf方法是否执行，removeIf中接口抽象类的自定义实现
                 mappings.removeIf(mapping -> mapping.getPatternParser() != null);
             }
 
@@ -96,17 +97,15 @@ public class SwaggerConfig implements BeanFactoryPostProcessor {
                     .paths(PathSelectors.any())
                     .build()
                     .groupName(group.getName())
-                    .extensions(openApiExtensionResolver.buildExtensions(group.getName()))
-                    .pathMapping(properties.getPathMapping())
                     // TODO 设置安全模式，swagger可以设置访问token
                     .securitySchemes(securitySchemes())
-                    .securityContexts(securityContexts());
+                    .securityContexts(securityContexts())
+                    .extensions(openApiExtensionResolver.buildExtensions(group.getName()))
+                    .pathMapping(properties.getPathMapping());
 
             String beanName = StringUtils.substringAfterLast(basePackage, ".") + "Docket";
             // 手动注入bean对象
-            beanFactory.autowireBean(docket);
-            // 设置bean的生命周期为单例
-            beanFactory.registerSingleton(beanName, docket);
+            SpringUtil.setBean(beanName, docket);
         }
     }
 
@@ -156,9 +155,4 @@ public class SwaggerConfig implements BeanFactoryPostProcessor {
                 .build();
     }
 
-
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
-    }
 }

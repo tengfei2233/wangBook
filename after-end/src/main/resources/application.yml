@@ -1,6 +1,11 @@
 server:
   port: 8888
 
+spring:
+  mvc:
+    pathmatch:
+      # 适配 boot 2.6 路由与 springfox 兼容
+      matching-strategy: ANT_PATH_MATCHER
 
 # 必须有，以下配置文件，knife4j插件自动获取
 knife4j:
@@ -27,7 +32,7 @@ swagger:
   title: "二手图书售卖系统后台"
   description: "二手图书售卖系统后台的api接口文档"
   version: "1.0.0"
-  pathMapping: /api
+  pathMapping: /
   # 作者信息
   contact:
     name: "wang"
@@ -35,7 +40,7 @@ swagger:
     url: "https://xxxx.com"
   # 接口文档分组
   groups:
-    - name: 1.接口文档一
-      basePackage: com.xxxx.controller.apiA
-    - name: 2.接口文档二
-      basePackage: com.xxxx.controller.apiB
+    - name: 1.普通用户接口文档
+      basePackage: com.wang.controller.user
+    - name: 2.管理员接口文档
+      basePackage: com.wang.controller.manage
