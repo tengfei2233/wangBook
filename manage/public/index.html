@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+  <style>
+    html,
+    body,
+    #app {
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    /* 美化滚动条 */
+    *::-webkit-scrollbar {
+      /*垂直滚动条宽度*/
+      width: 8px;
+      /*水平滚动条高度*/
+      height: 8px;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      /*滚动条里面深色条*/
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(236, 236, 236, 0.1);
+      background: rgb(200, 200, 200);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      /*滚动条里面深色条*/
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(236, 236, 236, 0.1);
+      background: rgb(128, 128, 128);
+    }
+
+    *::-webkit-scrollbar-track {
+      /*滚动条里面轨道*/
+      box-shadow: inset 0 0 5px rgba(236, 236, 236, 0.1);
+      border-radius: 10px;
+      background: #ededed;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong>
+  </noscript>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
+</html>

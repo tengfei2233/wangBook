@@ -6,3 +6,6 @@
 **/*.iml
 
 ## 前端
+**/node_modules
+**/dist
+**/package-lock.json
