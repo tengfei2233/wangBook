@@ -92,6 +92,15 @@
             <version>2.0.8</version>
         </dependency>
 
+        <!--  滑动验证码 -->
+        <!-- https://mvnrepository.com/artifact/com.xingyuv/spring-boot-starter-captcha-plus -->
+        <dependency>
+            <groupId>com.xingyuv</groupId>
+            <artifactId>spring-boot-starter-captcha-plus</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
+
         <!-- springboot-test -->
         <dependency>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -109,5 +118,18 @@
             </plugin>
         </plugins>
     </build>
+
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>thinkgem-repos2</id>-->
+<!--            <name>ThinkGem Repository 2</name>-->
+<!--            <url>https://raw.github.com/thinkgem/repository/master</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>central-repos1</id>-->
+<!--            <name>Central Repository 2</name>-->
+<!--            <url>http://repo1.maven.org/maven2/</url>-->
+<!--        </repository>-->
+<!--    </repositories>-->
 
 </project>

@@ -1,62 +1,46 @@
 import router from './router'
 import store from './store'
 import { Message } from 'element-ui'
-import NProgress from 'nprogress' // progress bar
-import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+// 进度条
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+// 获取用户token
+import { getToken } from '@/utils/auth'
 
-NProgress.configure({ showSpinner: false }) // NProgress Configuration
+NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login'] // no redirect whitelist
+// 访问白名单
+const whiteList = ['/login']
 
 router.beforeEach(async (to, from, next) => {
-    // start progress bar
+    // 进度条开始
     NProgress.start()
-    // determine whether the user has logged in
-    const hasToken = getToken()
+    const token = getToken()
     // 含有标题，设置标题
     if (to.meta.title) {
         document.title = '二手书售卖平台-' + to.meta.title
     }
-    if (hasToken) {
+    if (token) {
         if (to.path === '/login') {
-            // if is logged in, redirect to the home page
-            next({ path: '/index' })
-            NProgress.done()
+            // 如果已经登录，则不能再访问登录页面
+            next({ path: from.path })
         } else {
-            const hasGetUserInfo = store.getters.name
-            if (hasGetUserInfo) {
-                next()
-            } else {
-                try {
-                    // get user info
-                    await store.dispatch('getInfo')
-                    next()
-                } catch (error) {
-                    // remove token and go to login page to re-login
-                    await store.dispatch('resetToken')
-                    Message.error(error || 'Has Error')
-                    next('/')
-                    NProgress.done()
-                }
-            }
+            next()
         }
     } else {
-        /* has no token*/
-
+        // 没有token
         if (whiteList.indexOf(to.path) !== -1) {
-            // in the free login whitelist, go directly
+            // 如果是访问白名单，放行
             next()
         } else {
-            // other pages that do not have permission to access are redirected to the login page.
-            next('/')
-            NProgress.done()
+            // 否者跳转到登录页面
+            next('/login')
         }
     }
 })
 
 router.afterEach((to, from) => {
-    // finish progress bar
+    // 刷新url
     if (from.path != '/login' && from.path !== '/' && to.path == '/login') {
         window.location.reload()
     }

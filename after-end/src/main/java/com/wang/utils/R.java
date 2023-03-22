@@ -39,7 +39,7 @@ public class R<T> {
         return new R(500, msg);
     }
 
-    public static R<Void> fail(String msg,int code) {
+    public static R<Void> fail(String msg, int code) {
         return new R(code, msg);
     }
 
