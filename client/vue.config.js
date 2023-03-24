@@ -25,7 +25,7 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: {
           // TODO: 路径重写
-          ['^' + process.env.VUE_APP_BASE_API]: '/user'
+          ['^' + process.env.VUE_APP_BASE_API]: 'user'
         },
         // 用不到ws的时候就关闭
         ws: false,

@@ -15,9 +15,19 @@ import java.awt.*;
  */
 public class CaptchaUtil {
 
+    private static CircleCaptcha circleCaptcha = null;
+
+    static {
+        // 验证码宽高
+        circleCaptcha = new CircleCaptcha(160, 60);
+        circleCaptcha.setBackground(Color.PINK);
+        circleCaptcha.setFont(new Font("Arial", Font.BOLD, 48));
+    }
+
 
     /**
      * 随机验证码
+     *
      * @param len 数字验证码长度
      * @return
      */
@@ -28,13 +38,10 @@ public class CaptchaUtil {
 
     /**
      * 获取验证码绘制对象
+     *
      * @return
      */
     public static AbstractCaptcha getCaptchaDrawer() {
-        // 验证码宽高
-        CircleCaptcha circleCaptcha = new CircleCaptcha(160, 60);
-        circleCaptcha.setBackground(Color.PINK);
-        circleCaptcha.setFont(new Font("Arial", Font.BOLD, 48));
         return circleCaptcha;
     }
 

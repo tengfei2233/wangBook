@@ -3,7 +3,7 @@ import { MessageBox, Message } from 'element-ui'
 import { getToken,removeToken } from '@/utils/auth'
 import NProgress from 'nprogress'
 // 创建axios实例
-const baseURL = process.env.VUE_APP_REMOTE_HOST
+const baseURL = process.env.VUE_APP_BASE_API
 const service = axios.create({
     baseURL, // url = base url + request url
     // 超时时间

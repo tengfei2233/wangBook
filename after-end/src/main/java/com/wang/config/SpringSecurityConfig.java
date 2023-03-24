@@ -49,7 +49,7 @@ public class SpringSecurityConfig {
                         // swagger
                         .antMatchers("/favicon.ico", "/doc.html", "/webjars/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
                         // 接口
-                        .antMatchers("/user/login", "/user/getCaptcha").permitAll()
+                        .antMatchers("/user/login/login", "/user/login/getCaptcha").permitAll()
                         // 其它全部需要验证
                         .anyRequest().authenticated()
                 )

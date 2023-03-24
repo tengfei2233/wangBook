@@ -4,9 +4,73 @@
       <p id="title">用户登录</p>
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="账号密码登录" name="first">
-
+          <el-form ref="loginForm" :model="loginForm" :rules="rules1">
+            <el-form-item label prop="phone">
+              <el-input
+                v-model="loginForm.phone"
+                placeholder="请输入手机号"
+                :maxlength="11"
+                show-word-limit
+                clearable
+                prefix-icon="el-icon-mobile"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label prop="password">
+              <el-input
+                v-model="loginForm.password"
+                placeholder="请输入密码"
+                clearable
+                prefix-icon="el-icon-lock"
+                show-password
+              ></el-input>
+            </el-form-item>
+            <el-form-item label prop="captcha">
+              <el-input
+                v-model="loginForm.captcha"
+                placeholder="请输入验证码"
+                show-word-limit
+                clearable
+                prefix-icon="el-icon-picture-outline"
+                style="width: 60%"
+              ></el-input>
+              <div class="captcha-code">
+                <img :src="captchaImg" @click="getCaptcha" class="captcha-code-img" />
+              </div>
+            </el-form-item>
+            <el-form-item prop>
+              <el-button type="primary" style="width: 100%" @click="login">登录</el-button>
+            </el-form-item>
+          </el-form>
         </el-tab-pane>
         <el-tab-pane label="手机号登录" name="second">
+          <el-form ref="phoneLoginForm" :model="phoneLoginForm" :rules="rules2">
+            <el-form-item label prop="phone" style="margin-top:31.4px">
+              <el-input
+                v-model="phoneLoginForm.phone"
+                placeholder="请输入手机号"
+                :maxlength="11"
+                show-word-limit
+                clearable
+                prefix-icon="el-icon-mobile"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label prop="phoneCode">
+              <el-input
+                v-model="phoneLoginForm.phoneCode"
+                placeholder="请输入验证码"
+                show-word-limit
+                clearable
+                prefix-icon="el-icon-picture-outline"
+                style="width: 50%"
+              ></el-input>
+              <div class="phone-code">
+                <el-button type="primary" class="btn">获取验证码</el-button>
+              </div>
+            </el-form-item>
+            <el-form-item prop>
+              <el-button type="primary" style="width: 100%;margin-top:33px" @click="phoneLogin">登录</el-button>
+            </el-form-item>
+          </el-form>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -14,16 +78,86 @@
 </template>
 
 <script>
+import { $getCaptcha } from "@/api/user";
 export default {
   name: "login",
   data() {
     return {
-      activeName: "first"
+      activeName: "first",
+      captchaImg: "",
+      loginForm: {
+        phone: "",
+        password: "",
+        captcha: "",
+        uuid: ""
+      },
+      phoneLoginForm: {
+        phone: "",
+        phoneCode: ""
+      },
+      rules1: {
+        phone: [
+          {
+            required: true,
+            message: "请输入手机号",
+            trigger: "blur"
+          },
+          {
+            pattern: /^1(3|4|5|7|8|9)\d{9}$/,
+            message: "手机号格式错误",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: "请输入密码",
+            trigger: "blur"
+          }
+        ],
+        captcha: [
+          {
+            required: true,
+            message: "请输入验证码",
+            trigger: "blur"
+          }
+        ]
+      },
+      rules2: {
+        phone: [
+          {
+            required: true,
+            message: "请输入手机号",
+            trigger: "blur"
+          },
+          {
+            pattern: /^1(3|4|5|7|8|9)\d{9}$/,
+            message: "手机号格式错误",
+            trigger: "blur"
+          }
+        ],
+        phoneCode: [
+          {
+            required: true,
+            message: "请输入验证码",
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
-  methods:{
-    handleClick(){
-
+  created() {
+    this.getCaptcha();
+  },
+  methods: {
+    handleClick() {},
+    login() {},
+    phoneLogin() {},
+    getCaptcha() {
+      $getCaptcha().then(res => {
+        this.loginForm.uuid = res.data.uuid;
+        this.captchaImg = res.data.captcha;
+      });
     }
   }
 };
@@ -59,5 +193,29 @@ export default {
 ::v-deep .el-tabs__nav-scroll {
   width: 55%;
   margin: 0 auto;
+}
+
+.captcha-code {
+  width: 40%;
+  height: 40px;
+  float: right;
+}
+.captcha-code img {
+  cursor: pointer;
+  vertical-align: middle;
+}
+.captcha-code-img {
+  height: 40px;
+}
+
+.phone-code {
+  width: 50%;
+  height: 40px;
+  float: right;
+}
+
+.phone-code > .btn {
+  margin-left: 10px;
+  width: 90%;
 }
 </style>
