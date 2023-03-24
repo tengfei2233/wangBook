@@ -1,15 +1,22 @@
 package com.wang.controller.user;
 
+import cn.hutool.captcha.AbstractCaptcha;
+import cn.hutool.captcha.generator.CodeGenerator;
+import com.wang.utils.CaptchaUtil;
 import com.wang.utils.R;
-import com.xingyuv.captcha.model.vo.CaptchaVO;
-import com.xingyuv.captcha.service.CaptchaService;
+import com.wang.utils.RedisKey;
+import com.wang.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author feige
@@ -24,7 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 public class UserLoginController {
 
     @Resource
-    private CaptchaService captchaService;
+    private RedisUtil redisUtil;
+
 
     @ApiOperation("登录方法")
     @GetMapping("/login")
@@ -41,27 +49,20 @@ public class UserLoginController {
 
     @ApiOperation("获取验证码")
     @PostMapping("/getCaptcha")
-    public R<Object> getCaptcha(@RequestBody CaptchaVO captchaVO, HttpServletRequest request) {
-        captchaVO.setBrowserInfo(getRemoteId(request));
-        return R.ok("请求成功", captchaService.get(captchaVO).getRepData());
-    }
-
-    private static String getRemoteId(HttpServletRequest request) {
-        String xfwd = request.getHeader("X-Forwarded-For");
-        String ip = getRemoteIpFromXfwd(xfwd);
-        String ua = request.getHeader("user-agent");
-        if (StringUtils.isNotBlank(ip)) {
-            return ip + ua;
-        }
-        return request.getRemoteAddr() + ua;
-    }
-
-    private static String getRemoteIpFromXfwd(String xfwd) {
-        if (StringUtils.isNotBlank(xfwd)) {
-            String[] ipList = xfwd.split(",");
-            return StringUtils.trim(ipList[0]);
-        }
-        return null;
+    public R<Object> getCaptcha() {
+        String uuid = UUID.randomUUID().toString();
+        // 四位数随机验证码
+        CodeGenerator generator = CaptchaUtil.getCodeGenerator(4);
+        AbstractCaptcha captchaDrawer = CaptchaUtil.getCaptchaDrawer();
+        captchaDrawer.setGenerator(generator);
+        captchaDrawer.createCode();
+        String code = captchaDrawer.getCode();
+        // 将验证码存储起来，存储两分钟
+        redisUtil.set(RedisKey.CAPTCHA_KEY + uuid, code, 2);
+        Map<String, Object> map = new HashMap<>();
+        map.put("uuid", uuid);
+        map.put("captcha", captchaDrawer.getImageBase64Data());
+        return R.ok("请求成功", map);
     }
 
 }

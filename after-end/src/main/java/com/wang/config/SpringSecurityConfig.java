@@ -26,6 +26,8 @@ import javax.annotation.Resource;
 @EnableWebSecurity
 public class SpringSecurityConfig {
 
+
+
     @Resource
     private AuthenticationEntryPointImpl authenticationEntryPoint;
 

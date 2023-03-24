@@ -6,6 +6,10 @@ spring:
     pathmatch:
       # 适配 boot 2.6 路由与 springfox 兼容
       matching-strategy: ANT_PATH_MATCHER
+  redis:
+    port: 6379
+    host: 192.168.213.213
+    password: aaaaaa
 
 # 必须有，以下配置文件，knife4j插件自动获取
 knife4j:
