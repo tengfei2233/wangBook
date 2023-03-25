@@ -37,8 +37,8 @@
                 <img :src="captchaImg" @click="getCaptcha" class="captcha-code-img" />
               </div>
             </el-form-item>
-            <el-form-item prop>
-              <el-button type="primary" style="width: 100%" @click="login">登录</el-button>
+            <el-form-item style="margin-bottom: 0px !important">
+              <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -64,23 +64,34 @@
                 style="width: 50%"
               ></el-input>
               <div class="phone-code">
-                <el-button type="primary" class="btn">获取验证码</el-button>
+                <el-button
+                  type="primary"
+                  class="btn"
+                  :disabled="phoneCodeBtn.disabled"
+                  @click="getPhoneCode"
+                >{{phoneCodeBtn.msg}}</el-button>
               </div>
             </el-form-item>
-            <el-form-item prop>
+            <el-form-item style="margin-bottom: 0px !important">
               <el-button type="primary" style="width: 100%;margin-top:33px" @click="phoneLogin">登录</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
       </el-tabs>
+      <el-button type="text" class="register-btn" @click="openRegister">注册账号？</el-button>
     </div>
+    <register :visible.sync="registerOpen" />
   </div>
 </template>
 
 <script>
 import { $getCaptcha } from "@/api/user";
+import Register from "@/components/Register";
 export default {
   name: "login",
+  components: {
+    Register
+  },
   data() {
     return {
       activeName: "first",
@@ -143,7 +154,12 @@ export default {
             trigger: "blur"
           }
         ]
-      }
+      },
+      phoneCodeBtn: {
+        disabled: false,
+        msg: "获取验证码"
+      },
+      registerOpen: false
     };
   },
   created() {
@@ -158,6 +174,28 @@ export default {
         this.loginForm.uuid = res.data.uuid;
         this.captchaImg = res.data.captcha;
       });
+    },
+    getPhoneCode() {
+      const phone = this.phoneLoginForm.phone;
+      const isPhone = phone != "" && /^1(3|4|5|7|8|9)\d{9}$/.test(phone);
+      if (isPhone) {
+        let time = 60;
+        let interval = window.setInterval(() => {
+          this.phoneCodeBtn.msg = "请" + time + "后再获取";
+          this.phoneCodeBtn.disabled = true;
+          time--;
+          if (time <= 0) {
+            this.phoneCodeBtn.msg = "获取验证码";
+            this.phoneCodeBtn.disabled = false;
+            window.clearInterval(interval);
+          }
+        }, 1000);
+      } else {
+        this.$message.error("请输入正确的手机号");
+      }
+    },
+    openRegister() {
+      this.registerOpen = true;
     }
   }
 };
@@ -174,7 +212,7 @@ export default {
 }
 #login-container {
   width: 380px;
-  height: 380px;
+  height: 400px;
   padding: 0 20px;
   position: absolute;
   left: 50%;
@@ -217,5 +255,11 @@ export default {
 .phone-code > .btn {
   margin-left: 10px;
   width: 90%;
+}
+
+.register-btn {
+  position: absolute;
+  right: 30px;
+  text-decoration: underline;
 }
 </style>

@@ -35,6 +35,20 @@ const routes = [
                 meta: {
                     title: '购物车'
                 }
+            },
+            {
+                path: '/orders',
+                component: () => import("@/views/orders"),
+                meta: {
+                    title: '我的订单'
+                }
+            },
+            {
+                path: '/user',
+                component: () => import("@/views/user"),
+                meta: {
+                    title: '用户中心'
+                }
             }
         ]
     },

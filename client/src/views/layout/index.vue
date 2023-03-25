@@ -8,7 +8,7 @@
         <router-view />
       </el-main>
       <el-footer id="footer">
-        <p>~欢迎来到王的二手图书售卖王~</p>
+        <p>~欢迎来到王清泽的二手图书售卖王~</p>
       </el-footer>
     </el-container>
   </div>
