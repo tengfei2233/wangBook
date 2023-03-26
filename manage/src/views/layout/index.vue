@@ -1,24 +1,31 @@
 <template>
   <div id="container">
-    <side-bar/>
+    <side-bar class="sidebar-container" />
     <router-view />
   </div>
 </template>
 
 <script>
-import SideBar from "./SideBar.vue";
+import sideBar from "./sideBar";
 export default {
   name: "layout",
-  comments: {
-    SideBar
+  components: {
+    sideBar
   }
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+@import "@/assets/styles/sidebar.less";
+
 #container {
   position: relative;
   height: 100%;
   width: 100%;
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
 }
 </style>

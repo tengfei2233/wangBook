@@ -14,6 +14,7 @@ const routes = [
         path: '/',
         component: () => import("@/views/layout"),
         redirect: '/dashboard',
+        name:'dashboard',
         children: [
             {
                 path: '/dashboard',
@@ -22,17 +23,52 @@ const routes = [
                     title: '控制台'
                 }
             },
+            {
+                path: '/users',
+                component: () => import("@/views/users"),
+                meta: {
+                    title: '用户管理'
+                }
+            },
+            {
+                path: '/managers',
+                component: () => import("@/views/managers"),
+                meta: {
+                    title: '管理员管理'
+                }
+            },
+            {
+                path: '/books',
+                component: () => import("@/views/books"),
+                meta: {
+                    title: '书籍管理'
+                }
+            },
+            {
+                path: '/orders',
+                component: () => import("@/views/orders"),
+                meta: {
+                    title: '订单管理'
+                }
+            },
+            {
+                path: '/comments',
+                component: () => import("@/views/comments"),
+                meta: {
+                    title: '评论管理'
+                }
+            }
         ]
     },
     {
         path: '/login',
         component: () => import("@/views/login"),
+        name:'login',
         meta: {
             title: '登录'
         }
     }
 ]
-
 
 export default new VueRouter({
     mode: "history",
