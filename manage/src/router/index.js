@@ -20,7 +20,7 @@ const routes = [
                 path: '/dashboard',
                 component: () => import("@/views/dashboard"),
                 meta: {
-                    title: '控制台'
+                    title: '仪表盘'
                 }
             },
             {
@@ -56,6 +56,13 @@ const routes = [
                 component: () => import("@/views/comments"),
                 meta: {
                     title: '评论管理'
+                }
+            },
+            {
+                path: '/me',
+                component: () => import("@/views/me"),
+                meta: {
+                    title: '个人中心'
                 }
             }
         ]

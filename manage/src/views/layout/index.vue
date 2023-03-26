@@ -1,16 +1,29 @@
 <template>
-  <div id="container">
+  <div :class="classObj" id="container" style="--current-color:#409EFF;">
     <side-bar class="sidebar-container" />
-    <router-view />
+    <div class="main-container">
+      <div class="fixed-header">
+        <nav-bar />
+        <!-- <tags-view v-if="needTagsView" /> -->
+      </div>
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
 import sideBar from "./sideBar";
+import navBar from "./navbar";
 export default {
   name: "layout",
   components: {
-    sideBar
+    sideBar,
+    navBar
+  },
+  computed: {
+    classObj() {
+      return this.$store.state.collapse ? "hideSidebar" : "openSidebar";
+    }
   }
 };
 </script>

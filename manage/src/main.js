@@ -3,6 +3,7 @@ import App from './App.vue'
 import less from 'less';
 
 import router from './router'
+import store from './store'
 
 import './assets/styles/variables.less'
 
@@ -15,5 +16,6 @@ Vue.use(less);
 Vue.use(Element);
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app')

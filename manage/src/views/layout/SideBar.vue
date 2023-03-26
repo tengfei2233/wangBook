@@ -1,15 +1,16 @@
 <template>
   <div>
-    <logo :collapse="isCollapse" />
+    <logo :collapse="collapse" />
     <el-scrollbar class="theme-dark" wrap-class="scrollbar-wrapper">
       <el-menu
+        class="side-bar-menu"
         :default-active="activeMenu"
-        :collapse="isCollapse"
+        :collapse="collapse"
         background-color="#304156"
         text-color="#bfcbd9"
         :unique-opened="true"
         active-text-color="#409EFF"
-        :collapse-transition="false"
+        :collapse-transition="true"
         mode="vertical"
         router
       >
@@ -46,7 +47,6 @@ export default {
   },
   data() {
     return {
-      isCollapse: false,
       routeArr: []
     };
   },
@@ -56,6 +56,9 @@ export default {
   computed: {
     activeMenu() {
       return this.$route.path;
+    },
+    collapse() {
+      return this.$store.state.collapse;
     }
   }
 };
@@ -66,4 +69,5 @@ export default {
 /deep/ .theme-dark .el-submenu.is-active .el-submenu__title {
   color: #fff !important;
 }
+
 </style>
