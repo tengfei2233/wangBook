@@ -6,7 +6,9 @@
         <nav-bar />
         <!-- <tags-view v-if="needTagsView" /> -->
       </div>
-      <router-view />
+      <div style="padding:20px">
+        <router-view />
+      </div>
     </div>
   </div>
 </template>
