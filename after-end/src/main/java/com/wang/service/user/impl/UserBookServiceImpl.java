@@ -5,14 +5,8 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.wang.mapper.BookMapper;
-import com.wang.mapper.BookTypeMapper;
-import com.wang.mapper.CommentMapper;
-import com.wang.mapper.TypeMapper;
-import com.wang.pojo.Book;
-import com.wang.pojo.BookType;
-import com.wang.pojo.Comment;
-import com.wang.pojo.Type;
+import com.wang.mapper.*;
+import com.wang.pojo.*;
 import com.wang.pojo.bo.BookSearchBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
@@ -44,6 +38,8 @@ public class UserBookServiceImpl implements UserBookService {
     private BookTypeMapper bookTypeMapper;
     @Resource
     private CommentMapper commentMapper;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public TypeVo getTypeList() {
@@ -91,15 +87,37 @@ public class UserBookServiceImpl implements UserBookService {
 
     @Override
     public PageData<CommentVo> CommentList(Long bookId, PageQuery pageQuery) {
-        // 先查询评论列表
+        // 先获取父评论列表
         Page<Comment> commentPage = commentMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Comment>()
                 .eq(Comment::getBookId, bookId)
                 .eq(Comment::getStatus, 1)
+                .eq(Comment::getCmParentId, 0L)
                 .orderByDesc(Comment::getCmDate));
         // TODO　给每条评论设置设置用户信息
-
-        // TODO 生产评论树
-        return null;
+        List<CommentVo> commentVos = BeanUtil.copyToList(commentPage.getRecords(), CommentVo.class);
+        commentVos.stream().forEach(comment -> {
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .select(User::getUsername, User::getAvatar)
+                    .eq(User::getUserId, comment.getUserId()));
+            comment.setUsername(user.getUsername());
+            comment.setAvatar(user.getAvatar());
+            // 获取子评论
+            List<Comment> childComments = commentMapper.selectList(new LambdaQueryWrapper<Comment>()
+                    .eq(Comment::getStatus, 1)
+                    .eq(Comment::getCmParentId, comment.getCmId())
+                    .orderByDesc(Comment::getCmDate)
+            );
+            List<CommentVo> childCommentVos = BeanUtil.copyToList(childComments, CommentVo.class);
+            // 子评论设置用户信息
+            childCommentVos.stream().forEach(child -> {
+                User user2 = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                        .select(User::getUsername, User::getAvatar)
+                        .eq(User::getUserId, child.getUserId()));
+                child.setUsername(user2.getUsername());
+                child.setAvatar(user2.getAvatar());
+            });
+        });
+        return PageData.build(commentPage.getTotal(), commentVos);
     }
 
 

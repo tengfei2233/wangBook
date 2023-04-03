@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author feige
@@ -40,5 +41,8 @@ public class CommentVo {
 
     @ApiModelProperty("评论时间")
     private Date cmDate;
+
+    @ApiModelProperty("子评论")
+    private List<CommentVo> childComment;
 
 }
