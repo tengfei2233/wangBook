@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wang.mapper.*;
 import com.wang.pojo.*;
 import com.wang.pojo.bo.BookSearchBo;
+import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
 import com.wang.pojo.vo.CommentVo;
@@ -17,6 +18,7 @@ import com.wang.service.user.UserBookService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,6 +121,32 @@ public class UserBookServiceImpl implements UserBookService {
         });
         return PageData.build(commentPage.getTotal(), commentVos);
     }
+
+    @Override
+    public Boolean setComment(CommentBo bo) {
+        // 父评论id是否为0，为0代表是根评论
+        if (ObjectUtil.isNull(bo)) {
+            return false;
+        }
+        if (bo.getBookId().intValue() != 0) {
+            // 获取父评论是否存在
+            Comment comment = commentMapper.selectOne(new LambdaQueryWrapper<Comment>()
+                    .select(Comment::getStatus)
+                    .eq(Comment::getCmId, bo.getCmParentId()));
+            if (comment.getStatus().intValue() == 0) {
+                return false;
+            }
+        }
+        Comment comment = BeanUtil.copyProperties(bo, Comment.class);
+        comment.setCmParentId(bo.getCmParentId());
+        comment.setCmDate(new Date());
+        // TODO 获取用户id
+        comment.setUserId(null);
+        int insert = commentMapper.insert(comment);
+        return insert == 1;
+    }
+
+
 
 
 }

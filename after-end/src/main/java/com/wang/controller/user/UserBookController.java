@@ -1,6 +1,7 @@
 package com.wang.controller.user;
 
 import com.wang.pojo.bo.BookSearchBo;
+import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
 import com.wang.pojo.vo.CommentVo;
@@ -11,10 +12,7 @@ import com.wang.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -55,6 +53,14 @@ public class UserBookController {
     @GetMapping("/comments")
     public R<PageData<CommentVo>> getCommentList(Long bookId, PageQuery pageQuery) {
         return R.ok("请求成功", bookService.CommentList(bookId, pageQuery));
+    }
+
+
+
+    @ApiOperation("发表评论")
+    @PostMapping("/setComment")
+    public R<Void> setComment(@RequestBody CommentBo bo) {
+        return bookService.setComment(bo) ? R.ok("发表成功") : R.fail("发表失败");
     }
 
 

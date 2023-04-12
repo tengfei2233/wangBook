@@ -1,5 +1,7 @@
 package com.wang.pojo.bo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -10,14 +12,19 @@ import lombok.Data;
  */
 
 @Data
+@ApiModel("用户登录业务对象")
 public class LoginBo {
 
+    @ApiModelProperty("用户名")
     private String userName;
 
+    @ApiModelProperty("密码")
     private String passWord;
 
+    @ApiModelProperty("验证码id")
     private String uuid;
 
+    @ApiModelProperty("验证码")
     private String captcha;
 
 }

@@ -1,5 +1,7 @@
 package com.wang.pojo.bo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -10,10 +12,13 @@ import lombok.Data;
  */
 
 @Data
+@ApiModel("手机号登录业务对象")
 public class PhoneLoginBo {
 
+    @ApiModelProperty("手机号")
     private String phone;
 
+    @ApiModelProperty("验证码")
     private String phoneCode;
 
 }

@@ -1,6 +1,7 @@
 package com.wang.service.user;
 
 import com.wang.pojo.bo.BookSearchBo;
+import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
 import com.wang.pojo.vo.CommentVo;
@@ -21,4 +22,6 @@ public interface UserBookService {
     BookVo getBookInfo(Long bookId);
 
     PageData<CommentVo> CommentList(Long bookId, PageQuery pageQuery);
+
+    Boolean setComment(CommentBo bo);
 }

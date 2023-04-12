@@ -8,12 +8,12 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.213.213/old_book?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+    url: jdbc:mysql://192.168.2.129/old_book?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
     username: root
     password: "000000"
   redis:
     port: 6379
-    host: 192.168.213.213
+    host: 192.168.2.129
     password: aaaaaa
 
 # 必须有，以下配置文件，knife4j插件自动获取
@@ -53,3 +53,12 @@ swagger:
       basePackage: com.wang.controller.user
     - name: 2.管理员接口文档
       basePackage: com.wang.controller.manage
+
+
+mybatis-plus:
+  # 实体类包路径，用于在xml中通过类名使用实体类
+  type-aliases-package: com.wang.pojo
+  # xml文件包路径
+  mapper-locations: classpath*:mapper/**/*.xml
+  # mapper接口路径
+  mapper-packages: com.wang.mapper
