@@ -1,12 +1,11 @@
 package com.wang.controller.user;
 
+import com.alipay.api.AlipayApiException;
+import com.wang.pojo.bo.AddOrderBo;
 import com.wang.pojo.bo.BookSearchBo;
 import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
-import com.wang.pojo.vo.BookVo;
-import com.wang.pojo.vo.CommentVo;
-import com.wang.pojo.vo.PageData;
-import com.wang.pojo.vo.TypeVo;
+import com.wang.pojo.vo.*;
 import com.wang.service.user.UserBookService;
 import com.wang.utils.R;
 import io.swagger.annotations.Api;
@@ -15,6 +14,9 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author feige
@@ -49,12 +51,47 @@ public class UserBookController {
         return R.ok("请求成功", bookService.getBookInfo(bookId));
     }
 
+    @ApiOperation("加入购物车")
+    @PostMapping("/addCar")
+    public R<Void> addCar(@RequestBody AddOrderBo bo) {
+        return bookService.addCar(bo) ? R.ok("添加成功") : R.fail("添加失败");
+    }
+
+    @ApiOperation("购买书籍")
+    @GetMapping(value = "/buyBook", produces = "text/html;charset=UTF-8")
+    public String buyBook(@RequestParam AddOrderBo bo) {
+        return bookService.buyBook(bo);
+    }
+
+    @ApiOperation("付款成功同步回调")
+    @GetMapping("/syncNotify")
+    public void returnUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        bookService.returnUrl(request, response);
+    }
+
+    @ApiOperation("付款成功异步回调")
+    @PostMapping("/asyncNotify")
+    public String notifyUrl(HttpServletRequest request) throws AlipayApiException {
+        return bookService.notifyUrl(request);
+    }
+
+    @ApiOperation("购物车列表")
+    @GetMapping("/cars")
+    public R<PageData<CarVo>> getCarList(PageQuery pageQuery) {
+        return R.ok("请求成功", bookService.carList(pageQuery));
+    }
+
+    @ApiOperation("订单列表")
+    @GetMapping("/orders")
+    public R<PageData<OrderVo>> getOrderList(PageQuery pageQuery) {
+        return R.ok("请求成功", bookService.orderList( pageQuery));
+    }
+
     @ApiOperation("评论列表")
     @GetMapping("/comments")
     public R<PageData<CommentVo>> getCommentList(Long bookId, PageQuery pageQuery) {
         return R.ok("请求成功", bookService.CommentList(bookId, pageQuery));
     }
-
 
 
     @ApiOperation("发表评论")

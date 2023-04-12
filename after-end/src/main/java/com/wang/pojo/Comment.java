@@ -1,7 +1,5 @@
 package com.wang.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,7 +17,6 @@ public class Comment extends BaseEntity {
     /**
     * 评论id
     */
-    @TableId(type = IdType.AUTO)
     private Long cmId;
 
     /**

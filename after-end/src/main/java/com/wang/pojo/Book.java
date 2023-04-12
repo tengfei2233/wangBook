@@ -1,7 +1,5 @@
 package com.wang.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -19,7 +17,6 @@ public class Book extends BaseEntity {
     /**
     * 书籍id
     */
-    @TableId(type = IdType.AUTO)
     private Long bookId;
 
     /**
