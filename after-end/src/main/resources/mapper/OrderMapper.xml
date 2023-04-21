@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wang.mapper.OrderMapper">
+
+
+
+    <select id="selectHotBooks" resultType="bookVo" parameterType="integer">
+        select book_id, book_name, book_cover, book_author
+        from tb_book b
+                 left join (select book_id
+                            from tb_order
+                            where status = 1
+                            group by book_id
+                            order by count(book_id)) o
+                           on b.book_id = o.book_id
+        where b.status = 1 desc limit #{count}
+    </select>
+</mapper>

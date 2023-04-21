@@ -1,5 +1,6 @@
 package com.wang.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ public class Type implements Serializable {
     /**
     * 书籍类型id
     */
+    @TableId
     private Long typeId;
 
     /**

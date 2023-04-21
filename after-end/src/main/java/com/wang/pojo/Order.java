@@ -1,5 +1,6 @@
 package com.wang.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ public class Order extends BaseEntity {
     /**
     * 订单id
     */
+    @TableId
     private Long orderId;
 
     /**

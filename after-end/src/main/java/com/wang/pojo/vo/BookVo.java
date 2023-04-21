@@ -41,4 +41,7 @@ public class BookVo {
     @ApiModelProperty("单价")
     private BigDecimal bookPrice;
 
+    @ApiModelProperty("上架时间")
+    private BigDecimal bookAddDate;
+
 }

@@ -15,13 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "用户登录控制器",tags = {"普通用户登录控制器"})
 @RestController
-@RequestMapping("/manage")
+@RequestMapping("/manage/login")
 public class ManageLoginController {
 
     @ApiOperation("登录方法")
     @GetMapping("/login")
     public String login(){
         return "登录成功";
+    }
+
+    @ApiOperation("登出方法")
+    @GetMapping("/logout")
+    public String logout() {
+        return "登出成功";
     }
 
 }

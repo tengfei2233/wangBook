@@ -1,5 +1,6 @@
 package com.wang.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -15,6 +16,7 @@ public class User extends BaseEntity {
     /**
     * 用户id
     */
+    @TableId
     private Long userId;
 
     /**

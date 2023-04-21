@@ -1,5 +1,6 @@
 package com.wang.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -16,6 +17,7 @@ public class Car {
     /**
      * 书籍id
      */
+    @TableId
     private Long bookId;
 
     /**

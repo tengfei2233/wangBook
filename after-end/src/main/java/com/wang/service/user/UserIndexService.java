@@ -1,6 +1,9 @@
 package com.wang.service.user;
 
 import com.wang.pojo.vo.BannerVo;
+import com.wang.pojo.vo.BookVo;
+
+import java.util.List;
 
 /**
  * @author feige
@@ -10,6 +13,9 @@ import com.wang.pojo.vo.BannerVo;
  */
 public interface UserIndexService {
 
-    BannerVo getBannerList(Integer count);
+    List<BannerVo> getBannerList(Integer count);
 
+    List<BookVo> getNewBooksList(Integer count);
+
+    List<BookVo> getHotBooksList(Integer count);
 }
