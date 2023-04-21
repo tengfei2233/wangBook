@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @Author: tengfei
  * @Create: 2023 04 21 12:21
@@ -29,4 +31,7 @@ public class UserVo {
 
     @ApiModelProperty("用户类型")
     private Integer userType;
+
+    @ApiModelProperty("注册时间")
+    private Date addDate;
 }

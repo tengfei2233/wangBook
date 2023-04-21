@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @description
  */
 
-@Api(value = "用户登录控制器",tags = {"普通用户登录控制器"})
+@Api(tags = {"普通用户登录控制器"})
 @RestController
 @RequestMapping("/manage/login")
 public class ManageLoginController {
