@@ -16,10 +16,10 @@ import lombok.Data;
 public class LoginBo {
 
     @ApiModelProperty("用户名")
-    private String userName;
+    private String username;
 
     @ApiModelProperty("密码")
-    private String passWord;
+    private String password;
 
     @ApiModelProperty("验证码id")
     private String uuid;

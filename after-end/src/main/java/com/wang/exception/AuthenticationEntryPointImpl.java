@@ -23,6 +23,6 @@ import java.io.IOException;
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        ServletUtil.renderString(response, JSON.toJSONString(R.fail("无访问权限，请登录", 401)));
+        ServletUtil.renderString(response, JSON.toJSONString(R.fail("访问异常，请登录", 401)));
     }
 }

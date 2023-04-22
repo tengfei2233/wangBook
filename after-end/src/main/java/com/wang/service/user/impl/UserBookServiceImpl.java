@@ -20,6 +20,7 @@ import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.*;
 import com.wang.service.user.UserBookService;
+import com.wang.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -157,8 +158,8 @@ public class UserBookServiceImpl implements UserBookService {
         Comment comment = BeanUtil.copyProperties(bo, Comment.class);
         comment.setCmParentId(bo.getCmParentId());
         comment.setCmDate(new Date());
-        // TODO 获取用户id
-        comment.setUserId(null);
+        // 获取用户id
+        comment.setUserId(SecurityUtil.getUserId());
         int insert = commentMapper.insert(comment);
         return insert == 1;
     }
@@ -193,8 +194,8 @@ public class UserBookServiceImpl implements UserBookService {
         // TODO 构造订单
         Order order = new Order();
         order.setBookId(bo.getBookId());
-        // TODO 用户id
-        order.setUserId(null);
+        // 用户id
+        order.setUserId(SecurityUtil.getUserId());
         order.setOrderDate(new Date());
         order.setOrderNum(bo.getOrderNum());
         order.setStatus(0);

@@ -8,6 +8,8 @@ package com.wang.utils;
  */
 public class RedisKey {
 
-    public static final String CAPTCHA_KEY="captcha_key:";
+    public static final String CAPTCHA_KEY = "captcha_key:";
+
+    public static final String LOGIN_USER_KEY = "login_user:";
 
 }

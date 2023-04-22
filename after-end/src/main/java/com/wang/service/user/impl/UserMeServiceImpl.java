@@ -1,16 +1,19 @@
 package com.wang.service.user.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.wang.exception.UserException;
 import com.wang.mapper.UserMapper;
+import com.wang.pojo.LoginUser;
 import com.wang.pojo.User;
 import com.wang.pojo.bo.UserUpdatePwdBo;
 import com.wang.pojo.vo.UserVo;
 import com.wang.service.user.UserMeService;
+import com.wang.utils.RedisKey;
 import com.wang.utils.RedisUtil;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import com.wang.utils.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -32,18 +35,16 @@ public class UserMeServiceImpl implements UserMeService {
 
     @Override
     public UserVo info(HttpServletRequest request) {
-        // TODO 获取用户id
-        String token = request.getHeader("token");
-        Long userId = null;
-        UserVo userVo = redisUtil.get("userInfo:" + userId);
+        Long userId = SecurityUtil.getUserId();
+        LoginUser loginUser = redisUtil.get(RedisKey.LOGIN_USER_KEY + userId);
+        UserVo userVo = BeanUtil.copyProperties(loginUser.getUser(), UserVo.class);
         return userVo;
     }
 
     @Override
     public Boolean updatePwd(UserUpdatePwdBo bo, HttpServletRequest request) {
         // TODO 获取用户id
-        String token = request.getHeader("token");
-        Long userId = null;
+        Long userId = SecurityUtil.getUserId();
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .select(User::getPassword)
                 .eq(User::getUserId, userId)
@@ -51,11 +52,11 @@ public class UserMeServiceImpl implements UserMeService {
         if (ObjectUtil.isNull(user)) {
             throw new UserException("用户不存在/用户被锁定");
         }
-        if (!BCrypt.hashpw(bo.getOldPwd(), "").equals(user.getPassword())) {
+        if (!SecurityUtil.matchesPassword(bo.getOldPwd(), user.getPassword())) {
             throw new UserException("旧密码输入错误");
         }
         int update = userMapper.update(null, new LambdaUpdateWrapper<User>()
-                .set(User::getPassword, BCrypt.hashpw(bo.getNewPwd(), ""))
+                .set(User::getPassword, SecurityUtil.encryptPassword(bo.getNewPwd()))
                 .eq(User::getUserId, userId));
         return update >= 1;
     }

@@ -3,16 +3,14 @@ package com.wang.controller.user;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import com.wang.pojo.bo.LoginBo;
+import com.wang.service.user.UserLoginService;
 import com.wang.utils.CaptchaUtil;
 import com.wang.utils.R;
 import com.wang.utils.RedisKey;
 import com.wang.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -34,11 +32,14 @@ public class UserLoginController {
     @Resource
     private RedisUtil redisUtil;
 
+    @Resource
+    private UserLoginService loginService;
+
 
     @ApiOperation("登录方法")
-    @GetMapping("/login")
-    public String login(@RequestBody LoginBo bo) {
-        return "登录成功";
+    @PostMapping("/login")
+    public R<Map<String, String>> login(@RequestBody LoginBo bo) {
+        return R.ok("登录成功",loginService.login(bo));
     }
 
 
