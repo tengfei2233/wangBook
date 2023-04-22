@@ -4,21 +4,30 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wang.exception.BookException;
+import com.wang.exception.OrderException;
 import com.wang.mapper.BookMapper;
 import com.wang.mapper.BookTypeMapper;
+import com.wang.mapper.OrderMapper;
+import com.wang.mapper.UserMapper;
 import com.wang.pojo.Book;
 import com.wang.pojo.BookType;
+import com.wang.pojo.Order;
+import com.wang.pojo.User;
 import com.wang.pojo.bo.BookBo;
 import com.wang.pojo.bo.BookSearchBo;
+import com.wang.pojo.bo.OrderSearchBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
+import com.wang.pojo.vo.ManOrderVo;
 import com.wang.pojo.vo.PageData;
 import com.wang.service.manage.ManageBookService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +44,10 @@ public class ManageBookServiceImpl implements ManageBookService {
     private BookMapper bookMapper;
     @Resource
     private BookTypeMapper bookTypeMapper;
+    @Resource
+    private UserMapper userMapper;
+    @Resource
+    private OrderMapper orderMapper;
 
 
     @Override
@@ -87,5 +100,61 @@ public class ManageBookServiceImpl implements ManageBookService {
         Book book = BeanUtil.copyProperties(bo, Book.class);
         int update = bookMapper.update(book, null);
         return update >= 1;
+    }
+
+    @Override
+    public Boolean shelveBook(Long bookId) {
+        int update = bookMapper.update(null, new LambdaUpdateWrapper<Book>()
+                .eq(Book::getBookId, bookId)
+                .setSql(" status=!status "));
+        return update >= 1;
+    }
+
+    @Override
+    public PageData<ManOrderVo> getOrderList(OrderSearchBo searchBo, PageQuery pageQuery) {
+        Page<Order> orderPage = orderMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Order>()
+                .eq(ObjUtil.isNull(searchBo.getOrderId()), Order::getOrderId, searchBo.getOrderId())
+                .eq(ObjUtil.isNull(searchBo.getStatus()), Order::getStatus, searchBo.getStatus())
+                .orderByDesc(Order::getBuyDate));
+        List<ManOrderVo> orderList = new ArrayList<>((int) orderPage.getTotal());
+        orderPage.getRecords().forEach(order -> {
+            ManOrderVo orderVo = BeanUtil.copyProperties(order, ManOrderVo.class);
+            // 查询用户信息
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .select(User::getUsername)
+                    .eq(User::getUserId, order.getOrderId()));
+            orderVo.setUsername(user.getUsername());
+            // 查询书籍信息
+            Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                    .select(Book::getBookName, Book::getBookCover)
+                    .eq(Book::getBookId, order.getBookId()));
+            orderVo.setBookName(book.getBookName());
+            orderVo.setBookCover(book.getBookCover());
+            orderList.add(orderVo);
+        });
+        return PageData.build(orderPage.getTotal(), orderList);
+    }
+
+    @Override
+    public ManOrderVo getOrderInfo(Long orderId) {
+        Order order = orderMapper.selectById(orderId);
+        if (ObjUtil.isNull(order)) {
+            throw new OrderException("订单不存在");
+        }
+        ManOrderVo manOrderVo = BeanUtil.copyProperties(order, ManOrderVo.class);
+
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .select(User::getUsername, User::getPhone)
+                .eq(User::getUserId, order.getUserId()));
+        manOrderVo.setUsername(user.getUsername());
+        manOrderVo.setPhone(user.getPhone());
+
+        Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                .select(Book::getBookCover, Book::getBookName)
+                .eq(Book::getBookId, order.getBookId()));
+        manOrderVo.setBookName(book.getBookName());
+        manOrderVo.setBookCover(book.getBookCover());
+
+        return manOrderVo;
     }
 }

@@ -16,6 +16,26 @@ import javax.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalException {
 
+    @ExceptionHandler(BookException.class)
+    public R<Void> bookExceptionHandler(BookException e, HttpServletRequest request) {
+        return R.fail(e.getMessage());
+    }
+
+    @ExceptionHandler(UserException.class)
+    public R<Void> userExceptionHandler(UserException e, HttpServletRequest request) {
+        return R.fail(e.getMessage());
+    }
+
+    @ExceptionHandler(OrderException.class)
+    public R<Void> orderExceptionHandler(OrderException e, HttpServletRequest request) {
+        return R.fail(e.getMessage());
+    }
+
+    @ExceptionHandler(OtherException.class)
+    public R<Void> otherExceptionHandler(OtherException e, HttpServletRequest request) {
+        return R.fail(e.getMessage());
+    }
+
 
     @ExceptionHandler(Exception.class)
     public R<Void> exceptionHandler(Exception e, HttpServletRequest request) {
