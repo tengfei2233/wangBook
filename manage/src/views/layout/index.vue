@@ -15,7 +15,7 @@
 
 <script>
 import sideBar from "./sideBar";
-import navBar from "./navbar";
+import navBar from "./navBar";
 export default {
   name: "layout",
   components: {

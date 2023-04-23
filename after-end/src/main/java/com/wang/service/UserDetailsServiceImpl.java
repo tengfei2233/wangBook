@@ -51,7 +51,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (!PwdPass) {
             throw new UserException("密码错误");
         }
-        user.setPassword(null);
+        // TODO 不能设置为空
+        // user.setPassword(null);
         return new LoginUser(user);
     }
 

@@ -10,7 +10,10 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+      <el-dropdown
+        class="avatar-container right-menu-item hover-effect"
+        trigger="click"
+      >
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
@@ -34,22 +37,24 @@
 <script>
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
-
+import { $logout } from "@/api/me";
+import { removeToken } from "@/utils/auth";
 export default {
+  name: "navBar",
   data() {
     return {
-      avatar: require("@/assets/images/avatar.jpg")
+      avatar: require("@/assets/images/avatar.jpg"),
     };
   },
   components: {
     Breadcrumb,
-    Hamburger
+    Hamburger,
   },
   created() {},
   computed: {
     collapse() {
       return this.$store.collapse;
-    }
+    },
   },
   methods: {
     toggleSideBar() {
@@ -59,12 +64,19 @@ export default {
       this.$confirm("确定注销并退出系统吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
-        .then(() => {})
+        .then(() => {
+          $logout().then((res) => {
+            // 清除token
+            removeToken();
+            this.$notify.success(res.msg);
+            this.$router.push({ path: "/login" });
+          });
+        })
         .catch(() => {});
-    }
-  }
+    },
+  },
 };
 </script>
 

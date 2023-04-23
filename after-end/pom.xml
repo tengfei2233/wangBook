@@ -24,6 +24,13 @@
         <dependency>
             <artifactId>spring-boot-starter-web</artifactId>
             <groupId>org.springframework.boot</groupId>
+            <exclusions>
+                <!-- 去掉Jackson依赖，用fastjson -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-json</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -79,8 +86,8 @@
         <!-- fastjson2 -->
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-            <version>2.0.8</version>
+            <artifactId>fastjson2-extension-spring5</artifactId>
+            <version>2.0.29</version>
         </dependency>
 
         <!-- jwt token -->

@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
-import { getToken,removeToken } from '@/utils/auth'
+import { MessageBox, Notification } from 'element-ui'
+import { getToken, removeToken } from '@/utils/auth'
 import NProgress from 'nprogress'
 // 创建axios实例
 const baseURL = process.env.VUE_APP_BASE_API
@@ -19,7 +19,7 @@ service.interceptors.request.use(
         const token = getToken();
         if (token) {
             // 设置请求头，携带token
-            config.headers['Authorization'] = 'Bearer ' + token
+            config.headers['token'] = token
         }
         return config
     },
@@ -39,7 +39,7 @@ service.interceptors.response.use(
         const code = res.code || 200;
         // 相应状态码
         if (code !== 200) {
-            Message({
+            Notification({
                 message: res.msg || '请求出错',
                 type: 'error',
                 duration: 3 * 1000
@@ -75,7 +75,7 @@ service.interceptors.response.use(
         else if (message.includes("Request failed with status code")) {
             message = "系统接口" + message.substr(message.length - 3) + "异常";
         }
-        Message({
+        Notification({
             message: message,
             type: 'error',
             duration: 3 * 1000

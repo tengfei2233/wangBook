@@ -3,10 +3,10 @@
     <div id="login-container">
       <p id="title">后台管理登录</p>
       <el-form ref="loginForm" :model="loginForm" :rules="rules">
-        <el-form-item label prop="phone">
+        <el-form-item label prop="username">
           <el-input
             v-model="loginForm.username"
-            placeholder="请输入用户名"
+            placeholder="请输入手机号/用户名"
             :maxlength="11"
             show-word-limit
             clearable
@@ -23,7 +23,12 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" style="width: 100%;margin-top:35px" @click="login">登录</el-button>
+          <el-button
+            type="primary"
+            style="width: 100%; margin-top: 35px"
+            @click="login"
+            >登录</el-button
+          >
         </el-form-item>
       </el-form>
     </div>
@@ -31,35 +36,47 @@
 </template>
 
 <script>
+import { $login } from "@/api/me";
+import { setToken } from "@/utils/auth";
 export default {
   name: "login",
   data() {
     return {
       loginForm: {
         username: "",
-        password: ""
+        password: "",
       },
       rules: {
         username: [
           {
             required: true,
             message: "请输入用户名",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             message: "请输入密码",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   methods: {
-    login() {}
-  }
+    login() {
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          $login(this.loginForm).then((res) => {
+            setToken(res.data.token);
+            this.$notify.success(res.msg);
+            this.$router.push({ path: "/dashboard" });
+          });
+        }
+      });
+    },
+  },
 };
 </script>
 

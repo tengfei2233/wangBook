@@ -72,7 +72,6 @@ public class SpringSecurityConfig {
                 .csrf().disable()
                 // 基于token，不需要session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-
                 // 设置权限
                 .authorizeRequests(auth -> auth
                         // 请求放开
@@ -89,10 +88,11 @@ public class SpringSecurityConfig {
                         // 其它全部需要验证
                         .anyRequest().authenticated()
                 )
-                .logout().logoutUrl("/user/logout").logoutUrl("/manage/logout").logoutSuccessHandler(logoutService).and()
+                .logout().logoutUrl("/manage/logout").logoutSuccessHandler(logoutService).and()
+                .logout().logoutUrl("/user/logout").logoutSuccessHandler(logoutService).and()
                 // 访问前jwt认证（在UsernamePasswordAuthenticationFilter前加入jwt过滤器）
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                // TODO 身份认证
+                // 身份认证
                 .userDetailsService(userDetailsService)
                 .build();
     }

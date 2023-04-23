@@ -1,5 +1,7 @@
 package com.wang;
 
+import com.wang.utils.SecurityUtil;
+
 /**
  * @author feige
  * @version v1.0
@@ -9,9 +11,6 @@ package com.wang;
 public class b {
 
     public static void main(String[] args) {
-        a++;
+        System.out.println(SecurityUtil.encryptPassword("123"));
     }
-    static
-    int a=10;
-
 }

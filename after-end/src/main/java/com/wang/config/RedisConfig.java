@@ -20,9 +20,8 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
-
+        // SpringSecurity从Redis中获取用户信息，反序列化AutoType时的问题
         FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
-
         // 使用StringRedisSerializer来序列化和反序列化redis的key值
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringRedisSerializer);

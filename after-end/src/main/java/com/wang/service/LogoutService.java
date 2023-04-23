@@ -32,8 +32,8 @@ public class LogoutService implements LogoutSuccessHandler {
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         LoginUser loginUser = jwtUtil.getLoginUser(request);
         if (ObjUtil.isNotNull(loginUser)) {
-            redisUtil.del(RedisKey.LOGIN_USER_KEY + loginUser.getUserId());
+                redisUtil.del(RedisKey.LOGIN_USER_KEY + loginUser.getUserId());
         }
-        ServletUtil.renderString(response, JSON.toJSONString(R.ok("推出登录成功")));
+        ServletUtil.renderString(response, JSON.toJSONString(R.ok("退出登录成功")));
     }
 }

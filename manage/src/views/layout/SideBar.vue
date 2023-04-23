@@ -15,21 +15,25 @@
         router
       >
         <template v-for="route in routeArr">
-          <el-submenu v-if="route.subs" :index="route.index">
+          <el-submenu v-if="route.subs" :index="route.index" :key="route.index">
             <template slot="title">
               <i :class="route.icon"></i>
               <span>{{ route.title }}</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item v-for="sub in route.subs" :index="sub.index">
+              <el-menu-item
+                v-for="sub in route.subs"
+                :index="sub.index"
+                :key="sub.index"
+              >
                 <i :class="sub.icon"></i>
-                <span slot="title">{{sub.title}}</span>
+                <span slot="title">{{ sub.title }}</span>
               </el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item v-else :index="route.index">
+          <el-menu-item v-else :index="route.index" :key="route.index">
             <i :class="route.icon"></i>
-            <span slot="title">{{route.title}}</span>
+            <span slot="title">{{ route.title }}</span>
           </el-menu-item>
         </template>
       </el-menu>
@@ -43,11 +47,11 @@ import routes from "./menu.js";
 export default {
   name: "sideBar",
   components: {
-    logo
+    logo,
   },
   data() {
     return {
-      routeArr: []
+      routeArr: [],
     };
   },
   created() {
@@ -59,8 +63,8 @@ export default {
     },
     collapse() {
       return this.$store.state.collapse;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -69,5 +73,4 @@ export default {
 /deep/ .theme-dark .el-submenu.is-active .el-submenu__title {
   color: #fff !important;
 }
-
 </style>

@@ -19,7 +19,7 @@ service.interceptors.request.use(
         const token = getToken();
         if (token) {
             // 设置请求头，携带token
-            config.headers['Authorization'] = 'Bearer ' + token
+            config.headers['token'] =  token
         }
         return config
     },

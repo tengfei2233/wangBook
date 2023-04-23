@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
  * @Author: tengfei
@@ -48,7 +49,7 @@ public class JwtUtil {
      */
     public String createJwt(Long userId) {
 
-        String token = Jwts.builder().claim("userId", userId).signWith(SignatureAlgorithm.HS256, salt).compact();
+        String token = Jwts.builder().claim("date", new Date().getTime()).claim("userId", userId).signWith(SignatureAlgorithm.HS256, salt).compact();
         return token;
     }
 
@@ -115,12 +116,13 @@ public class JwtUtil {
      */
     public Long getUserId(String token) {
         Claims claims = parseToken(token);
-        Long userId = (Long) claims.get("userId");
+        Long userId = Long.parseLong(claims.get("userId").toString());
         return userId;
     }
 
     private Claims parseToken(String token) {
-        return Jwts.parser().setSigningKey(salt).parseClaimsJwt(token).getBody();
+        return Jwts.parser().setSigningKey(salt).parseClaimsJws(token).getBody();
     }
+
 
 }

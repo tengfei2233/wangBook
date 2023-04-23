@@ -32,11 +32,15 @@
               <el-dropdown-menu slot="dropdown">
                 <router-link to="/user">
                   <el-dropdown-item>
-                    <span style="display:block;" class="dropdown-select-info">个人中心</span>
+                    <span style="display: block" class="dropdown-select-info"
+                      >个人中心</span
+                    >
                   </el-dropdown-item>
                 </router-link>
                 <el-dropdown-item divided @click.native="logout">
-                  <span style="display:block;" class="dropdown-select-info">退出登录</span>
+                  <span style="display: block" class="dropdown-select-info"
+                    >退出登录</span
+                  >
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -53,11 +57,13 @@
 </template>
 
 <script>
+import { $logout } from '@/api/me';
+import { removeToken } from '@/utils/auth';
 export default {
   name: "topBar",
   data() {
     return {
-      avatar: ""
+      avatar: "",
     };
   },
   created() {
@@ -69,12 +75,19 @@ export default {
       this.$confirm("是否确定退出当前系统？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
-        .then(() => {})
+        .then(() => {
+          $logout().then((res) => {
+            // 清除token
+            removeToken();
+            this.$notify.success(res.msg);
+            this.$router.push({ path: "/login" });
+          });
+        })
         .catch(() => {});
-    }
-  }
+    },
+  },
 };
 </script>
 

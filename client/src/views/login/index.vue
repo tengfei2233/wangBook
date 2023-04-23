@@ -5,10 +5,10 @@
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="账号密码登录" name="first">
           <el-form ref="loginForm" :model="loginForm" :rules="rules1">
-            <el-form-item label prop="phone">
+            <el-form-item label prop="username">
               <el-input
-                v-model="loginForm.phone"
-                placeholder="请输入手机号"
+                v-model="loginForm.username"
+                placeholder="请输入用户名/手机号"
                 :maxlength="11"
                 show-word-limit
                 clearable
@@ -34,17 +34,23 @@
                 style="width: 60%"
               ></el-input>
               <div class="captcha-code">
-                <img :src="captchaImg" @click="getCaptcha" class="captcha-code-img" />
+                <img
+                  :src="captchaImg"
+                  @click="getCaptcha"
+                  class="captcha-code-img"
+                />
               </div>
             </el-form-item>
             <el-form-item style="margin-bottom: 0px !important">
-              <el-button type="primary" style="width: 100%;" @click="login">登录</el-button>
+              <el-button type="primary" style="width: 100%" @click="login"
+                >登录</el-button
+              >
             </el-form-item>
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="手机号登录" name="second">
           <el-form ref="phoneLoginForm" :model="phoneLoginForm" :rules="rules2">
-            <el-form-item label prop="phone" style="margin-top:31.4px">
+            <el-form-item label prop="phone" style="margin-top: 31.4px">
               <el-input
                 v-model="phoneLoginForm.phone"
                 placeholder="请输入手机号"
@@ -69,97 +75,101 @@
                   class="btn"
                   :disabled="phoneCodeBtn.disabled"
                   @click="getPhoneCode"
-                >{{phoneCodeBtn.msg}}</el-button>
+                  >{{ phoneCodeBtn.msg }}</el-button
+                >
               </div>
             </el-form-item>
             <el-form-item style="margin-bottom: 0px !important">
-              <el-button type="primary" style="width: 100%;margin-top:33px" @click="phoneLogin">登录</el-button>
+              <el-button
+                type="primary"
+                style="width: 100%; margin-top: 33px"
+                @click="phoneLogin"
+                >登录</el-button
+              >
             </el-form-item>
           </el-form>
         </el-tab-pane>
       </el-tabs>
-      <el-button type="text" class="register-btn" @click="openRegister">注册账号？</el-button>
+      <el-button type="text" class="register-btn" @click="openRegister"
+        >注册账号？</el-button
+      >
     </div>
     <register :visible.sync="registerOpen" />
   </div>
 </template>
 
 <script>
-import { $getCaptcha } from "@/api/user";
+import { $getCaptcha, $login } from "@/api/me";
 import Register from "@/components/Register";
+import { setToken } from "@/utils/auth";
 export default {
   name: "login",
   components: {
-    Register
+    Register,
   },
   data() {
     return {
       activeName: "first",
       captchaImg: "",
       loginForm: {
-        phone: "",
+        username: "",
         password: "",
         captcha: "",
-        uuid: ""
+        uuid: "",
       },
       phoneLoginForm: {
         phone: "",
-        phoneCode: ""
+        phoneCode: "",
       },
       rules1: {
-        phone: [
+        username: [
           {
             required: true,
-            message: "请输入手机号",
-            trigger: "blur"
+            message: "请输入用户名/手机号",
+            trigger: "blur",
           },
-          {
-            pattern: /^1(3|4|5|7|8|9)\d{9}$/,
-            message: "手机号格式错误",
-            trigger: "blur"
-          }
         ],
         password: [
           {
             required: true,
             message: "请输入密码",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         captcha: [
           {
             required: true,
             message: "请输入验证码",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       rules2: {
         phone: [
           {
             required: true,
             message: "请输入手机号",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             pattern: /^1(3|4|5|7|8|9)\d{9}$/,
             message: "手机号格式错误",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         phoneCode: [
           {
             required: true,
             message: "请输入验证码",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       phoneCodeBtn: {
         disabled: false,
-        msg: "获取验证码"
+        msg: "获取验证码",
       },
-      registerOpen: false
+      registerOpen: false,
     };
   },
   created() {
@@ -167,10 +177,20 @@ export default {
   },
   methods: {
     handleClick() {},
-    login() {},
+    login() {
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          $login(this.loginForm).then((res) => {
+            setToken(res.data.token);
+            this.$notify.success(res.msg);
+            this.$router.push({ path: "/home" });
+          });
+        }
+      });
+    },
     phoneLogin() {},
     getCaptcha() {
-      $getCaptcha().then(res => {
+      $getCaptcha().then((res) => {
         this.loginForm.uuid = res.data.uuid;
         this.captchaImg = res.data.captcha;
       });
@@ -196,8 +216,8 @@ export default {
     },
     openRegister() {
       this.registerOpen = true;
-    }
-  }
+    },
+  },
 };
 </script>
 
