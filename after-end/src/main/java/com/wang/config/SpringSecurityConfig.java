@@ -1,6 +1,5 @@
 package com.wang.config;
 
-import com.wang.common.RoleEnum;
 import com.wang.exception.AccessDeniedHandlerImpl;
 import com.wang.exception.AuthenticationEntryPointImpl;
 import com.wang.service.JwtAuthenticationTokenFilter;
@@ -81,15 +80,15 @@ public class SpringSecurityConfig {
                         // .antMatchers("/user/logout", "/manage/logout").permitAll()
                         // 方形接口（具体匹配接口放上面，防止匹配顺序问题）
                         .antMatchers("/user/login/login", "/user/login/getCaptcha", "/manage/login/login").permitAll()
-                        // 普通用户接口
-                        .antMatchers("/user/**").hasRole(RoleEnum.USER.name())
+                        // 普通用户接口 TODO hasRole会给权限字符串加上 ROLE_ 前缀，hasAnyAuthority不会
+                        .antMatchers("/user/**").hasAuthority("0")
                         // 管理员接口
-                        .antMatchers("/manage/**").hasRole(RoleEnum.ADMIN.name())
+                        .antMatchers("/manage/**").hasAuthority("1")
                         // 其它全部需要验证
                         .anyRequest().authenticated()
                 )
-                .logout().logoutUrl("/manage/logout").logoutSuccessHandler(logoutService).and()
-                .logout().logoutUrl("/user/logout").logoutSuccessHandler(logoutService).and()
+                // 通配/user/logout与/manage/logout
+                .logout().logoutUrl("/*/logout").logoutSuccessHandler(logoutService).and()
                 // 访问前jwt认证（在UsernamePasswordAuthenticationFilter前加入jwt过滤器）
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 // 身份认证

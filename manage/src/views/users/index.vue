@@ -5,8 +5,29 @@
 </template>
 
 <script>
+import { $userList } from "@/api/user";
 export default {
-  name: "users"
+  name: "users",
+  data() {
+    return {
+      params: {
+        pageNum: 1,
+        pageSize: 10,
+        searchKey: "",
+        status: undefined,
+      },
+    };
+  },
+  created() {
+    this.getUserList();
+  },
+  methods: {
+    getUserList() {
+      $userList(this.params).then((res) => {
+        console.log(res);
+      });
+    },
+  },
 };
 </script>
 
