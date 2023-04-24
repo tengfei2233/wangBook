@@ -44,9 +44,13 @@ public class ManageUserServiceImpl implements ManageUserService {
 
     @Override
     public Boolean lockUser(Long userId) {
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .select(User::getStatus)
+                .eq(User::getUserId, userId));
         int update = userMapper.update(null, new LambdaUpdateWrapper<User>()
                 .eq(User::getUserId, userId)
-                .setSql("status=!status"));
+                .set(user.getStatus() == 1, User::getStatus, 0)
+                .set(user.getStatus() == 0, User::getStatus, 1));
         return update >= 1;
     }
 }

@@ -34,4 +34,7 @@ public class UserVo {
 
     @ApiModelProperty("注册时间")
     private Date addDate;
+
+    @ApiModelProperty("用户状态,1:正常,0:禁用")
+    private Integer status;
 }

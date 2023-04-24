@@ -35,7 +35,7 @@ public class ManageUserController {
 
     @ApiOperation("封禁/解封用户")
     @PostMapping("/lock")
-    public R<Void> lockUser(@RequestParam(required = true)@Param("用户id") Long userId ) {
+    public R<Void> lockUser(@RequestParam("userId")@Param("用户id") Long userId ) {
         return userService.lockUser(userId)?R.ok("更改成功"):R.fail("更改失败");
     }
 
