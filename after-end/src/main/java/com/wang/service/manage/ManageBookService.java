@@ -7,6 +7,7 @@ import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
 import com.wang.pojo.vo.ManOrderVo;
 import com.wang.pojo.vo.PageData;
+import com.wang.pojo.vo.TypeVo;
 
 /**
  * @Author: tengfei
@@ -26,4 +27,10 @@ public interface ManageBookService {
     PageData<ManOrderVo> getOrderList(OrderSearchBo searchBo, PageQuery pageQuery);
 
     ManOrderVo getOrderInfo(Long orderId);
+
+    PageData<TypeVo> getTypeList(PageQuery pageQuery);
+
+    Boolean delType(Long typeId);
+
+    Boolean addType(String typeName);
 }

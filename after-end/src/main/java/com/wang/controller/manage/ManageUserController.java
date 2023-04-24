@@ -1,6 +1,7 @@
 package com.wang.controller.manage;
 
 import com.wang.pojo.bo.PageQuery;
+import com.wang.pojo.bo.UserBo;
 import com.wang.pojo.bo.UserSearchBo;
 import com.wang.pojo.vo.PageData;
 import com.wang.pojo.vo.UserVo;
@@ -37,6 +38,12 @@ public class ManageUserController {
     @PostMapping("/lock")
     public R<Void> lockUser(@RequestParam("userId")@Param("用户id") Long userId ) {
         return userService.lockUser(userId)?R.ok("更改成功"):R.fail("更改失败");
+    }
+
+    @ApiOperation("添加用户用户")
+    @PostMapping("/add")
+    public R<Void> addUser(@RequestBody UserBo bo ) {
+        return userService.addUser(bo)?R.ok("添加成功"):R.fail("添加失败");
     }
 
 

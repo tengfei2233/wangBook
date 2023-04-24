@@ -16,6 +16,7 @@ spring:
     host: 192.168.2.129
     password: aaaaaa
 
+
 # 必须有，以下配置文件，knife4j插件自动获取
 knife4j:
   enable: true

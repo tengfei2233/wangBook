@@ -35,9 +35,14 @@ export default [
                 title: "书籍列表"
             },
             {
-                icon:'el-icon-shopping-bag-2',
+                icon: 'el-icon-shopping-bag-2',
                 index: "/orders",
                 title: "订单列表"
+            },
+            {
+                icon: 'el-icon-c-scale-to-original',
+                index: "/types",
+                title: "书籍类型列表"
             }
         ]
     },

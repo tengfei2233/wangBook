@@ -8,14 +8,8 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wang.exception.BookException;
 import com.wang.exception.OrderException;
-import com.wang.mapper.BookMapper;
-import com.wang.mapper.BookTypeMapper;
-import com.wang.mapper.OrderMapper;
-import com.wang.mapper.UserMapper;
-import com.wang.pojo.Book;
-import com.wang.pojo.BookType;
-import com.wang.pojo.Order;
-import com.wang.pojo.User;
+import com.wang.mapper.*;
+import com.wang.pojo.*;
 import com.wang.pojo.bo.BookBo;
 import com.wang.pojo.bo.BookSearchBo;
 import com.wang.pojo.bo.OrderSearchBo;
@@ -23,6 +17,7 @@ import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.BookVo;
 import com.wang.pojo.vo.ManOrderVo;
 import com.wang.pojo.vo.PageData;
+import com.wang.pojo.vo.TypeVo;
 import com.wang.service.manage.ManageBookService;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +43,8 @@ public class ManageBookServiceImpl implements ManageBookService {
     private UserMapper userMapper;
     @Resource
     private OrderMapper orderMapper;
+    @Resource
+    private TypeMapper typeMapper;
 
 
     @Override
@@ -156,5 +153,33 @@ public class ManageBookServiceImpl implements ManageBookService {
         manOrderVo.setBookCover(book.getBookCover());
 
         return manOrderVo;
+    }
+
+    @Override
+    public PageData<TypeVo> getTypeList(PageQuery pageQuery) {
+        Page<Type> types = typeMapper.selectPage(pageQuery.build(), null);
+        List<TypeVo> typeVos = BeanUtil.copyToList(types.getRecords(), TypeVo.class);
+        return PageData.build(types.getTotal(), typeVos);
+    }
+
+    @Override
+    public Boolean delType(Long typeId) {
+        int i = typeMapper.deleteById(typeId);
+        int j = bookTypeMapper.delete(new LambdaQueryWrapper<BookType>()
+                .eq(BookType::getTypeId, typeId));
+        return i >= 1 && j >= 0;
+    }
+
+    @Override
+    public Boolean addType(String typeName) {
+        Type type = typeMapper.selectOne(new LambdaQueryWrapper<Type>()
+                .eq(Type::getTypeName, typeName));
+        if (ObjUtil.isNotNull(type)) {
+            throw new BookException("该书籍类型已存在");
+        }
+        Type newType = new Type();
+        newType.setTypeName(typeName);
+        int insert = typeMapper.insert(newType);
+        return insert >= 1;
     }
 }
