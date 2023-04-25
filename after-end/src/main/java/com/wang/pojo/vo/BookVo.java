@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author feige
@@ -42,6 +43,15 @@ public class BookVo {
     private BigDecimal bookPrice;
 
     @ApiModelProperty("上架时间")
-    private BigDecimal bookAddDate;
+    private Date bookAddDate;
+
+    @ApiModelProperty("类型Id")
+    private Long typeId;
+
+    @ApiModelProperty("类型名称")
+    private String typeName;
+
+    @ApiModelProperty("书籍状态,1:上架,0:下架")
+    private Integer status;
 
 }

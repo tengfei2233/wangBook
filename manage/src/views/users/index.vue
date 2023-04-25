@@ -210,6 +210,7 @@ export default {
       user: {
         username: undefined,
         password: undefined,
+        phone: undefined,
         avatar: undefined,
       },
       rules: {

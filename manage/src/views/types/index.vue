@@ -1,7 +1,6 @@
 <template>
   <div>
     <el-button type="success" plain @click="addTypeBtn">添加书籍类型</el-button>
-    <div></div>
     <el-table v-loading="loading" :data="typeList" style="margin-top: 20px">
       <el-table-column
         label="书籍类型id"

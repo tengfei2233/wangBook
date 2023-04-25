@@ -9,6 +9,13 @@ export function $typeList(params) {
     })
 }
 
+export function $typeListNoPage() {
+    return request({
+        url: '/book/types/noPage',
+        method: 'get',
+    })
+}
+
 // 删除书籍类型
 export function $delType(typeId) {
     return request({

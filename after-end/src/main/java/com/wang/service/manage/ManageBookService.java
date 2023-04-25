@@ -9,6 +9,8 @@ import com.wang.pojo.vo.ManOrderVo;
 import com.wang.pojo.vo.PageData;
 import com.wang.pojo.vo.TypeVo;
 
+import java.util.List;
+
 /**
  * @Author: tengfei
  * @Create: 2023 04 21 23:56
@@ -29,6 +31,8 @@ public interface ManageBookService {
     ManOrderVo getOrderInfo(Long orderId);
 
     PageData<TypeVo> getTypeList(PageQuery pageQuery);
+
+    List<TypeVo> getTypeList();
 
     Boolean delType(Long typeId);
 

@@ -91,7 +91,7 @@ export default {
         this.$loading().close();
       } else {
         this.$notify.error(res.msg);
-        this.loading().close();
+        this.$loading().close();
       }
     },
     // 上传前loading加载

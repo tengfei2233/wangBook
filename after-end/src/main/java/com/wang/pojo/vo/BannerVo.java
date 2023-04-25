@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author feige
  * @version v1.0
@@ -26,5 +28,8 @@ public class BannerVo {
 
     @ApiModelProperty("轮播图是否展示(0:不展示,1:展示)")
     private Integer bnIsShow;
+
+    @ApiModelProperty("添加时间")
+    private Date bnDate;
 
 }

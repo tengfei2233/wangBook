@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,13 +42,13 @@ public class ManageBookController {
 
     @ApiOperation("添加书籍")
     @PostMapping("/add")
-    public R<Void> addBook(BookBo bo) {
+    public R<Void> addBook(@RequestBody BookBo bo) {
         return bookService.addBook(bo) ? R.ok("添加成功") : R.fail("添加失败");
     }
 
     @ApiOperation("修改书籍")
     @PostMapping("/update")
-    public R<Void> updateBook(BookBo bo) {
+    public R<Void> updateBook(@RequestBody BookBo bo) {
         return bookService.updateBook(bo) ? R.ok("修改成功") : R.fail("修改失败");
     }
 
@@ -77,6 +78,12 @@ public class ManageBookController {
         return R.ok("请求成功", bookService.getTypeList(pageQuery));
     }
 
+    @ApiOperation("书籍类型列表")
+    @GetMapping("/types/noPage")
+    public R<List<TypeVo>> getTypeList() {
+        return R.ok("请求成功", bookService.getTypeList());
+    }
+
     @ApiOperation("删除书籍类型")
     @PostMapping("/delType")
     public R<Void> delType(@RequestParam("typeId") @ApiParam("书籍类型Id") Long typeId) {
@@ -85,7 +92,7 @@ public class ManageBookController {
 
     @ApiOperation("添加书籍类型")
     @PostMapping("/addType")
-    public R<Void> addType(@RequestBody @ApiParam("书籍类型名称") Map<String,String> map) {
+    public R<Void> addType(@RequestBody @ApiParam("书籍类型名称") Map<String, String> map) {
         return bookService.addType(map.get("typeName")) ? R.ok("添加成功") : R.fail("添加失败");
     }
 

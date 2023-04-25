@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "echarts": "^5.4.2",
     "element-ui": "^2.15.13",
     "js-cookie": "^3.0.1",
     "nprogress": "^0.2.0",

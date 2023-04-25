@@ -40,5 +40,8 @@ public class BookBo {
     @ApiModelProperty("价格")
     private BigDecimal bookPrice;
 
+    @ApiModelProperty("书籍类型")
+    private Long typeId;
+
 
 }

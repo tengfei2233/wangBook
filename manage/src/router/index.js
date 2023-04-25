@@ -31,13 +31,6 @@ const routes = [
                 }
             },
             {
-                path: '/managers',
-                component: () => import("@/views/managers"),
-                meta: {
-                    title: '管理员管理'
-                }
-            },
-            {
                 path: '/books',
                 component: () => import("@/views/books"),
                 meta: {
@@ -70,6 +63,13 @@ const routes = [
                 component: () => import("@/views/types"),
                 meta: {
                     title: '书籍类型管理'
+                }
+            },
+            {
+                path: '/banners',
+                component: () => import("@/views/banners"),
+                meta: {
+                    title: '轮播图管理'
                 }
             }
         ]

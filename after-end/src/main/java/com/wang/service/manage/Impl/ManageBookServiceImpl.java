@@ -22,9 +22,7 @@ import com.wang.service.manage.ManageBookService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,26 +49,47 @@ public class ManageBookServiceImpl implements ManageBookService {
     public PageData<BookVo> getBookList(BookSearchBo searchBo, PageQuery pageQuery) {
         // 查询是否是指定分类
         List<Long> bookIds = null;
-        if (ObjUtil.isNotEmpty(searchBo.getType())) {
+        if (ObjUtil.isNotNull(searchBo.getType())) {
             List<BookType> bookTypes = bookTypeMapper.selectList(new LambdaQueryWrapper<BookType>()
                     .select(BookType::getBookId)
                     .eq(BookType::getTypeId, searchBo.getType())
                     .orderByAsc(BookType::getBookId));
-            if (ObjUtil.isNotEmpty(bookTypes)) {
+            if (ObjUtil.isNotNull(bookTypes) && bookTypes.size() >= 1) {
                 bookIds = bookTypes.stream()
                         .map(BookType::getBookId)
                         .collect(Collectors.toList());
+            } else {
+                return PageData.build(0L, null);
             }
         }
         Page<Book> bookPage = bookMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Book>()
                 .in(ObjectUtil.isNotNull(bookIds), Book::getBookId, bookIds)
-                .eq(Book::getStatus, 1)
-                .like(searchBo.getPattern().intValue() == 1, Book::getBookName, searchBo.getKey())
-                .eq(searchBo.getPattern().intValue() == 2, Book::getBookAuthor, searchBo.getKey())
-                .eq(searchBo.getPattern().intValue() == 3, Book::getBookIsbn, searchBo.getKey())
+                .and(ObjUtil.isNotNull(searchBo.getKey()), wrapper -> {
+                    wrapper.like(searchBo.getPattern().intValue() == 1, Book::getBookName, searchBo.getKey())
+                            .eq(searchBo.getPattern().intValue() == 2, Book::getBookAuthor, searchBo.getKey())
+                            .eq(searchBo.getPattern().intValue() == 3, Book::getBookIsbn, searchBo.getKey());
+                })
         );
         List<BookVo> bookVos = BeanUtil.copyToList(bookPage.getRecords(), BookVo.class);
-
+        // 增加书籍类型
+        Map<Long, String> map = new HashMap<>();
+        bookVos.forEach(item -> {
+            BookType bookType = bookTypeMapper.selectOne(new LambdaQueryWrapper<BookType>()
+                    .select(BookType::getTypeId)
+                    .eq(BookType::getBookId, item.getBookId()));
+            String typeName;
+            if (ObjUtil.isNotNull(typeName = map.get(bookType.getTypeId()))) {
+            } else {
+                Type type = typeMapper.selectOne(new LambdaQueryWrapper<Type>()
+                        .select(Type::getTypeName)
+                        .eq(Type::getTypeId, bookType.getTypeId()));
+                typeName = type.getTypeName();
+                map.put(bookType.getTypeId(), type.getTypeName());
+            }
+            item.setTypeId(bookType.getTypeId());
+            item.setTypeName(typeName);
+        });
+        map.clear();
         return PageData.build(bookPage.getTotal(), bookVos);
     }
 
@@ -79,13 +98,24 @@ public class ManageBookServiceImpl implements ManageBookService {
         if (ObjUtil.isNull(bo)) {
             throw new BookException("参数为空");
         }
-
+        Book oldBook = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                .eq(Book::getBookIsbn, bo.getBookIsbn()));
+        if (ObjUtil.isNotNull(oldBook)) {
+            throw new BookException("ISBN号相同，书籍存在");
+        }
         Book book = BeanUtil.copyProperties(bo, Book.class);
         // 防止前端传入id
         book.setBookId(null);
         book.setBookAddDate(new Date());
         book.setStatus(1);
         int insert = bookMapper.insert(book);
+        // 设置书籍类型
+        if (ObjUtil.isNotNull(bo.getTypeId())) {
+            BookType bookType = new BookType();
+            bookType.setBookId(book.getBookId());
+            bookType.setTypeId(bo.getTypeId());
+            bookTypeMapper.insert(bookType);
+        }
         return insert >= 1;
     }
 
@@ -95,41 +125,92 @@ public class ManageBookServiceImpl implements ManageBookService {
             throw new BookException("参数为空");
         }
         Book book = BeanUtil.copyProperties(bo, Book.class);
-        int update = bookMapper.update(book, null);
+        int update = bookMapper.updateById(book);
+        // 修改书籍类型
+        if (ObjUtil.isNotNull(bo.getTypeId())) {
+            BookType bookType = bookTypeMapper.selectOne(new LambdaQueryWrapper<BookType>()
+                    .eq(BookType::getBookId, book.getBookId()));
+            if (ObjUtil.isNull(bookType)) {
+                bookType = new BookType();
+                bookType.setBookId(book.getBookId());
+                bookType.setTypeId(bo.getTypeId());
+                bookTypeMapper.insert(bookType);
+            } else if (!bookType.getTypeId().equals(bo.getTypeId())) {
+                bookType.setTypeId(bo.getTypeId());
+                bookTypeMapper.updateById(bookType);
+            }
+        }
         return update >= 1;
     }
 
     @Override
     public Boolean shelveBook(Long bookId) {
+        Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                .select(Book::getStatus)
+                .eq(Book::getBookId, bookId));
+        if (ObjUtil.isNull(book)) {
+            throw new BookException("书籍不存在");
+        }
+
         int update = bookMapper.update(null, new LambdaUpdateWrapper<Book>()
                 .eq(Book::getBookId, bookId)
-                .setSql(" status=!status "));
+                .set(book.getStatus() == 1, Book::getStatus, 0)
+                .set(book.getStatus() == 0, Book::getStatus, 1));
         return update >= 1;
     }
 
     @Override
     public PageData<ManOrderVo> getOrderList(OrderSearchBo searchBo, PageQuery pageQuery) {
-        Page<Order> orderPage = orderMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Order>()
-                .eq(ObjUtil.isNull(searchBo.getOrderId()), Order::getOrderId, searchBo.getOrderId())
-                .eq(ObjUtil.isNull(searchBo.getStatus()), Order::getStatus, searchBo.getStatus())
-                .orderByDesc(Order::getBuyDate));
-        List<ManOrderVo> orderList = new ArrayList<>((int) orderPage.getTotal());
-        orderPage.getRecords().forEach(order -> {
-            ManOrderVo orderVo = BeanUtil.copyProperties(order, ManOrderVo.class);
-            // 查询用户信息
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .select(User::getUsername)
-                    .eq(User::getUserId, order.getOrderId()));
-            orderVo.setUsername(user.getUsername());
-            // 查询书籍信息
-            Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
-                    .select(Book::getBookName, Book::getBookCover)
-                    .eq(Book::getBookId, order.getBookId()));
-            orderVo.setBookName(book.getBookName());
-            orderVo.setBookCover(book.getBookCover());
-            orderList.add(orderVo);
-        });
-        return PageData.build(orderPage.getTotal(), orderList);
+        if (ObjUtil.isNotNull(searchBo.getVal()) && ObjUtil.isNotNull(searchBo.getPattern())) {
+            Page<ManOrderVo> manOrderVos = null;
+            if (searchBo.getPattern() == 2) {
+                // 按用户名/手机号搜索
+                manOrderVos = orderMapper.selectOrderListByUser(pageQuery.build(), searchBo);
+                // 添加书籍信息
+                manOrderVos.getRecords().forEach(item -> {
+                    Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                            .select(Book::getBookName, Book::getBookCover)
+                            .eq(Book::getBookId, item.getBookId()));
+                    item.setBookCover(book.getBookCover());
+                    item.setBookName(book.getBookName());
+                });
+            } else {
+                manOrderVos = orderMapper.selectOrderListByBook(pageQuery.build(), searchBo);
+                // 添加用户信息
+                manOrderVos.getRecords().forEach(item -> {
+                    User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                            .select(User::getUsername, User::getPhone)
+                            .eq(User::getUserId, item.getUserId()));
+                    item.setUsername(user.getUsername());
+                    item.setPhone(user.getPhone());
+                });
+            }
+            return PageData.build(manOrderVos.getTotal(), manOrderVos.getRecords());
+        } else {
+            // 按订单id搜索
+            Page<Order> orderPage = orderMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Order>()
+                    .eq(ObjUtil.isNotNull(searchBo.getPattern()) && searchBo.getPattern() == 1 && ObjUtil.isNotNull(searchBo.getVal())
+                            , Order::getOrderId, searchBo.getVal())
+                    .eq(ObjUtil.isNotNull(searchBo.getStatus()), Order::getStatus, searchBo.getStatus())
+                    .orderByDesc(Order::getOrderDate));
+            List<ManOrderVo> orderList = new ArrayList<>(orderPage.getRecords().size());
+            orderPage.getRecords().forEach(order -> {
+                ManOrderVo orderVo = BeanUtil.copyProperties(order, ManOrderVo.class);
+                // 查询用户信息
+                User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                        .select(User::getUsername)
+                        .eq(User::getUserId, order.getOrderId()));
+                orderVo.setUsername(user.getUsername());
+                // 查询书籍信息
+                Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                        .select(Book::getBookName, Book::getBookCover)
+                        .eq(Book::getBookId, order.getBookId()));
+                orderVo.setBookName(book.getBookName());
+                orderVo.setBookCover(book.getBookCover());
+                orderList.add(orderVo);
+            });
+            return PageData.build(orderPage.getTotal(), orderList);
+        }
     }
 
     @Override
@@ -160,6 +241,14 @@ public class ManageBookServiceImpl implements ManageBookService {
         Page<Type> types = typeMapper.selectPage(pageQuery.build(), null);
         List<TypeVo> typeVos = BeanUtil.copyToList(types.getRecords(), TypeVo.class);
         return PageData.build(types.getTotal(), typeVos);
+    }
+
+    @Override
+    public List<TypeVo> getTypeList() {
+        List<Type> types = typeMapper.selectList(new LambdaQueryWrapper<Type>()
+                .orderByDesc(Type::getTypeId));
+        List<TypeVo> typeVos = BeanUtil.copyToList(types, TypeVo.class);
+        return typeVos;
     }
 
     @Override

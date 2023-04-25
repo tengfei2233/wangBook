@@ -311,7 +311,7 @@ public class UserBookServiceImpl implements UserBookService {
     @Override
     public PageData<OrderVo> orderList(PageQuery pageQuery) {
         Page<Order> orderPage = orderMapper.selectPage(pageQuery.build(), null);
-        List<OrderVo> orders = new ArrayList<>((int) orderPage.getTotal());
+        List<OrderVo> orders = new ArrayList<>(orderPage.getRecords().size());
         orderPage.getRecords().forEach(order -> {
             Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
                     .select(Book::getBookName, Book::getBookCover)
@@ -335,7 +335,7 @@ public class UserBookServiceImpl implements UserBookService {
     public PageData<CarVo> carList(PageQuery pageQuery) {
 
         Page<Car> carPage = carMapper.selectPage(pageQuery.build(), null);
-        List<CarVo> cars = new ArrayList<>((int) carPage.getTotal());
+        List<CarVo> cars = new ArrayList<>(carPage.getRecords().size());
         carPage.getRecords().forEach(car -> {
             Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
                     .select(Book::getBookName, Book::getBookCover, Book::getBookAuthor,

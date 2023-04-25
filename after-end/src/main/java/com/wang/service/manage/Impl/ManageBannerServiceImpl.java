@@ -59,7 +59,7 @@ public class ManageBannerServiceImpl implements ManageBannerService {
             throw new OtherException("参数为空");
         }
         Banner banner = BeanUtil.copyProperties(bo, Banner.class);
-        int update = bannerMapper.update(banner, null);
+        int update = bannerMapper.updateById(banner);
         return update >= 1;
     }
 
