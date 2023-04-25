@@ -64,6 +64,13 @@ const routes = [
                 meta: {
                     title: '个人中心'
                 }
+            },
+            {
+                path: '/types',
+                component: () => import("@/views/types"),
+                meta: {
+                    title: '书籍类型管理'
+                }
             }
         ]
     },
