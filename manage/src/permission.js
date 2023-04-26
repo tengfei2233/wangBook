@@ -1,6 +1,4 @@
 import router from './router'
-import store from './store'
-import { Message } from 'element-ui'
 // 进度条
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -26,7 +24,7 @@ router.beforeEach(async (to, from, next) => {
         }
     } else {
         // 没有token
-        if (to.path=="/login") {
+        if (to.path == "/login") {
             // 如果是访问白名单，放行
             next()
         } else {

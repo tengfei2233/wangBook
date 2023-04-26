@@ -6,10 +6,7 @@ import com.wang.service.user.UserMeService;
 import com.wang.utils.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +32,7 @@ public class UserMeController {
     }
 
     @ApiOperation("修改密码")
-    @GetMapping("/updatePwd")
+    @PostMapping("/updatePwd")
     public R<Void> updatePwd(@RequestBody UserUpdatePwdBo bo, HttpServletRequest request) {
         return meService.updatePwd(bo, request) ? R.ok("修改成功") : R.fail("修改失败");
     }

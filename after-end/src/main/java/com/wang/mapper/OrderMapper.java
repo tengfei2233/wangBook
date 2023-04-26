@@ -6,10 +6,12 @@ import com.wang.pojo.Order;
 import com.wang.pojo.bo.OrderSearchBo;
 import com.wang.pojo.vo.BookVo;
 import com.wang.pojo.vo.ManOrderVo;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: tengfei
@@ -24,4 +26,10 @@ public interface OrderMapper extends BaseMapper<Order> {
     Page<ManOrderVo> selectOrderListByUser(Page<ManOrderVo> build, @Param("bo") OrderSearchBo searchBo);
 
     Page<ManOrderVo> selectOrderListByBook(Page<ManOrderVo> build, @Param("bo") OrderSearchBo searchBo);
+
+    @MapKey("")
+    List<Map> getTenNums();
+
+    @MapKey("")
+    List<Map> getTenPrices();
 }

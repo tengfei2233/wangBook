@@ -1,6 +1,7 @@
 package com.wang;
 
-import com.wang.pojo.LoginUser;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.wang.mapper.UserMapper;
 import com.wang.pojo.User;
 import com.wang.utils.RedisUtil;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,8 @@ public class TestDemo {
 
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private UserMapper userMapper;
 
     public static void main(String[] args) {
 
@@ -27,14 +30,11 @@ public class TestDemo {
 
     @Test
     public void testRedis() {
-        User user = new User();
-        user.setPassword("1111");
-        user.setUserId(11L);
-        user.setUserType(1);
-        LoginUser loginUser = new LoginUser(user);
-        redisUtil.set("user", user);
-        User o = redisUtil.get("user");
-        System.out.println(o);
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .select(User::getPhone)
+                .eq(User::getUserId, 1L)
+                .eq(User::getStatus, 1));
+        System.out.println(user);
     }
 
 

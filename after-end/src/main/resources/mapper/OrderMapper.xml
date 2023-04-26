@@ -40,4 +40,65 @@
         ) o join (select book_id,book_name,book_cover from tb_book where book_name like '%${bo.val}%') b
         b.book_id=o.book_id order by o.order_date desc
     </select>
+
+    <select id="getTenNums" resultType="java.util.Map">
+        select td.click_date as date, ifnull(o.num, 0) as num
+        from (
+            select curdate() as click_date
+            union all
+            select date_sub(curdate(), interval 1 day) as click_date
+            union all
+            select date_sub(curdate(), interval 2 day) as click_date
+            union all
+            select date_sub(curdate(), interval 3 day) as click_date
+            union all
+            select date_sub(curdate(), interval 4 day) as click_date
+            union all
+            select date_sub(curdate(), interval 5 day) as click_date
+            union all
+            select date_sub(curdate(), interval 6 day) as click_date
+            union all
+            select date_sub(curdate(), interval 7 day) as click_date
+            union all
+            select date_sub(curdate(), interval 8 day) as click_date
+            union all
+            select date_sub(curdate(), interval 9 day) as click_date
+            ) td
+            left join (select date_format(buy_date, '%Y-%m-%d') as buy_date, sum(order_num) as num
+            from tb_order
+            group by date_format(buy_date, '%Y-%m-%d')) o
+        on td.click_date = o.buy_date
+        order by td.click_date asc
+    </select>
+
+    <select id="getTenPrices" resultType="java.util.Map">
+        select td.click_date as date, ifnull(o.price, 0) as price
+        from (
+            select curdate() as click_date
+            union all
+            select date_sub(curdate(), interval 1 day) as click_date
+            union all
+            select date_sub(curdate(), interval 2 day) as click_date
+            union all
+            select date_sub(curdate(), interval 3 day) as click_date
+            union all
+            select date_sub(curdate(), interval 4 day) as click_date
+            union all
+            select date_sub(curdate(), interval 5 day) as click_date
+            union all
+            select date_sub(curdate(), interval 6 day) as click_date
+            union all
+            select date_sub(curdate(), interval 7 day) as click_date
+            union all
+            select date_sub(curdate(), interval 8 day) as click_date
+            union all
+            select date_sub(curdate(), interval 9 day) as click_date
+            ) td
+            left join (select date_format(buy_date, '%Y-%m-%d') as buy_date, sum(order_price) as price
+            from tb_order
+            group by date_format(buy_date, '%Y-%m-%d')) o
+        on td.click_date = o.buy_date
+        order by td.click_date asc
+    </select>
+
 </mapper>

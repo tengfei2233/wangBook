@@ -7,7 +7,7 @@ export default new Vuex.Store({
 
     state: {
         // 侧边栏是否关闭
-        collapse: false
+        collapse: false,
     },
     actions: {
         setCollapse({ state }) {

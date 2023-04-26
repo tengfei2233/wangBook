@@ -8,6 +8,7 @@
 
 <script>
 import * as echarts from "echarts";
+import { $chartData } from "@/api/dashboard";
 export default {
   name: "dashboard",
   data() {
@@ -29,19 +30,19 @@ export default {
         },
         xAxis: {
           type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun","1","2","3"],
+          data: [],
         },
         yAxis: {
           type: "value",
         },
         series: [
           {
-            data: [820, 932, 901, 934, 1290, 1330, 1320,432,534,256],
+            data: [],
             name: "销售量",
             type: "line",
             itemStyle: {
               normal: {
-                color: "#fac858"
+                color: "#fac858",
               },
             },
           },
@@ -49,7 +50,7 @@ export default {
             name: "销售额",
             type: "bar",
             barWidth: "50%",
-            data: [10, 52, 200, 334, 390, 330, 220,123,234,345],
+            data: [],
             itemStyle: {
               normal: {
                 color: "#91cc75",
@@ -58,19 +59,35 @@ export default {
           },
         ],
       },
+      date: [],
+      numData: [],
+      priceData: [],
     };
   },
   mounted() {
     this.initChart();
-
-    setTimeout((res) => {
-      console.log(this.myChart);
-      this.myChart.setOption(this.config);
-    }, 1000);
+    this.getChartData();
   },
   methods: {
     initChart() {
       this.myChart = echarts.init(this.$refs.myChart);
+    },
+    getChartData() {
+      $chartData().then((res) => {
+        const data = res.data;
+        data.num.forEach((item) => {
+          this.date.push(item.date);
+          this.numData.push(item.num);
+        });
+        data.price.forEach((item) => {
+          this.priceData.push(item.price);
+        });
+        // chart设置数据
+        this.config.xAxis.data = this.date;
+        this.config.series[0].data = this.numData;
+        this.config.series[1].data = this.priceData;
+        this.myChart.setOption(this.config);
+      });
     },
   },
 };

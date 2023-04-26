@@ -43,7 +43,9 @@ export default {
   name: "navBar",
   data() {
     return {
-      avatar: require("@/assets/images/avatar.jpg"),
+      avatar: sessionStorage.getItem("avatar")
+        ? sessionStorage.getItem("avatar")
+        : require("@/assets/images/avatar.jpg"),
     };
   },
   components: {

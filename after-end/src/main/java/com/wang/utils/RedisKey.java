@@ -12,4 +12,6 @@ public class RedisKey {
 
     public static final String LOGIN_USER_KEY = "login_user:";
 
+    public static final String PHONE_CODE = "phone_code:";
+
 }

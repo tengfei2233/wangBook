@@ -88,6 +88,8 @@ export default {
       if (res.code == 200) {
         this.imageUrl = res.data;
         this.$emit("input", this.imageUrl);
+        // TODO: 子类通知弗雷
+        this.$emit("uploaded")
         this.$loading().close();
       } else {
         this.$notify.error(res.msg);
