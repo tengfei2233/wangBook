@@ -172,8 +172,4 @@ public class ManageLoginServiceImpl implements ManageLoginService {
         // TODO 接入短信发送平台
         return i;
     }
-
-    private void refreshUserCache() {
-
-    }
 }

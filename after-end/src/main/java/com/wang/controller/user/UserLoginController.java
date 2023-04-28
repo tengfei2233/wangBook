@@ -43,12 +43,6 @@ public class UserLoginController {
     }
 
 
-    @ApiOperation("登出方法")
-    @GetMapping("/logout")
-    public String logout() {
-        return "登出成功";
-    }
-
     @ApiOperation("获取验证码")
     @GetMapping("/getCaptcha")
     public R<Object> getCaptcha() {

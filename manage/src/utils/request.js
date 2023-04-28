@@ -47,7 +47,7 @@ service.interceptors.response.use(
 
             if (code === 401 || code === 403) {
                 // to re-login
-                MessageBox.confirm('你的登录已过期，请重新登录', '提示', {
+                MessageBox.confirm(res.msg + '，请重新登录', '提示', {
                     confirmButtonText: '重新登录',
                     cancelButtonText: '取消',
                     type: 'warning'

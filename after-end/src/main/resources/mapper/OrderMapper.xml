@@ -7,15 +7,15 @@
 
 
     <select id="selectHotBooks" resultType="bookVo" parameterType="integer">
-        select book_id, book_name, book_cover, book_author
+        select b.book_id, book_name, book_cover, book_author,book_price
         from tb_book b
-                 left join (select book_id
+                 left join (select book_id,buy_date
                             from tb_order
                             where status = 1
                             group by book_id
                             order by count(book_id)) o
                            on b.book_id = o.book_id
-        where b.status = 1 desc limit #{count}
+        where b.status = 1 order by o.buy_date  desc limit #{count}
     </select>
     <select id="selectOrderListByUser" resultType="com.wang.pojo.vo.ManOrderVo">
         select u.user_id, u.username, u.phone, o.*

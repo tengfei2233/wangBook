@@ -33,6 +33,9 @@ export default {
   top: 0;
   left: 0;
 }
+.el-main{
+  padding: 20px 0;
+}
 #footer {
   height: 50px !important;
   padding: 0;

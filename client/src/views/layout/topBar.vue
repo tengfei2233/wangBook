@@ -57,19 +57,18 @@
 </template>
 
 <script>
-import { $logout } from '@/api/me';
-import { removeToken } from '@/utils/auth';
+import { $logout } from "@/api/me";
+import { removeToken } from "@/utils/auth";
 export default {
   name: "topBar",
   data() {
     return {
-      avatar: "",
+      avatar: sessionStorage.getItem("avatar")
+        ? sessionStorage.getItem("avatar")
+        : require("@/assets/images/avatar.jpg"),
     };
   },
-  created() {
-    // TODO: 设置头像
-    this.avatar = require("@/assets/images/avatar.jpg");
-  },
+  created() {},
   methods: {
     logout() {
       this.$confirm("是否确定退出当前系统？", "提示", {

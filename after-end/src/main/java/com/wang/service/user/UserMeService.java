@@ -1,5 +1,6 @@
 package com.wang.service.user;
 
+import com.wang.pojo.bo.UserUpdatePhoneBo;
 import com.wang.pojo.bo.UserUpdatePwdBo;
 import com.wang.pojo.vo.UserVo;
 
@@ -15,4 +16,10 @@ public interface UserMeService {
     UserVo info(HttpServletRequest request);
 
     Boolean updatePwd(UserUpdatePwdBo bo, HttpServletRequest request);
+
+    Boolean updatePhone(UserUpdatePhoneBo bo);
+
+    Boolean updateAvatar(String avatar);
+
+    String getCode(String phone);
 }

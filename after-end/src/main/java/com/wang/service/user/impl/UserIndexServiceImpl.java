@@ -46,7 +46,7 @@ public class UserIndexServiceImpl implements UserIndexService {
     @Override
     public List<BookVo> getNewBooksList(Integer count) {
         List<Book> books = bookMapper.selectList(new LambdaQueryWrapper<Book>()
-                .select(Book::getBookId, Book::getBookAuthor, Book::getBookName, Book::getBookCover)
+                .select(Book::getBookId, Book::getBookAuthor, Book::getBookName, Book::getBookCover,Book::getBookPrice)
                 .eq(Book::getStatus, 1)
                 .orderByDesc(Book::getBookAddDate)
                 .last("limit " + count));
