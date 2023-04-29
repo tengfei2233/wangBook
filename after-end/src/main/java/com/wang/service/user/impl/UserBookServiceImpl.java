@@ -62,10 +62,10 @@ public class UserBookServiceImpl implements UserBookService {
     private CarMapper carMapper;
 
     @Override
-    public TypeVo getTypeList() {
+    public List<TypeVo> getTypeList() {
         List<Type> types = typeMapper.selectList(null);
-        TypeVo typeVo = BeanUtil.copyProperties(types, TypeVo.class);
-        return typeVo;
+        List<TypeVo> typeVos = BeanUtil.copyToList(types, TypeVo.class);
+        return typeVos;
     }
 
     @Override
@@ -85,11 +85,13 @@ public class UserBookServiceImpl implements UserBookService {
         }
         Page<Book> bookPage = bookMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Book>()
                 .select(Book::getBookId, Book::getBookName, Book::getBookCover, Book::getBookAuthor, Book::getBookPrice)
-                .in(ObjectUtil.isNotNull(bookIds), Book::getBookId, bookIds)
                 .eq(Book::getStatus, 1)
-                .like(searchBo.getPattern().intValue() == 1, Book::getBookName, searchBo.getKey())
-                .eq(searchBo.getPattern().intValue() == 2, Book::getBookAuthor, searchBo.getKey())
-                .eq(searchBo.getPattern().intValue() == 3, Book::getBookIsbn, searchBo.getKey())
+                .in(ObjectUtil.isNotNull(bookIds), Book::getBookId, bookIds)
+                .and(ObjUtil.isNotNull(searchBo.getKey()), wrapper -> {
+                    wrapper.like(searchBo.getPattern() == 1, Book::getBookName, searchBo.getKey())
+                            .eq(searchBo.getPattern() == 2, Book::getBookAuthor, searchBo.getKey())
+                            .eq(searchBo.getPattern() == 3, Book::getBookIsbn, searchBo.getKey());
+                })
         );
         List<BookVo> bookVos = BeanUtil.copyToList(bookPage.getRecords(), BookVo.class);
 

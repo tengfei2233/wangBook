@@ -67,6 +67,8 @@ mybatis-plus:
     db-config:
       # 表名前缀
       table-prefix: tb_
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 
 token:

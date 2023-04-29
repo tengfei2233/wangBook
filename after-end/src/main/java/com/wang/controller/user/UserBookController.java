@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author feige
@@ -35,7 +36,7 @@ public class UserBookController {
 
     @ApiOperation("书籍分类列表")
     @GetMapping("/types")
-    public R<TypeVo> getTypeList() {
+    public R<List<TypeVo>> getTypeList() {
         return R.ok("请求成功", bookService.getTypeList());
     }
 

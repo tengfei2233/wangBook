@@ -9,6 +9,7 @@ import com.wang.pojo.vo.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author feige
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * @description
  */
 public interface UserBookService {
-    TypeVo getTypeList();
+    List<TypeVo> getTypeList();
 
     PageData<BookVo> getBookList(BookSearchBo searchBo, PageQuery pageQuery);
 

@@ -36,7 +36,10 @@ export default {
   },
   methods: {
     toDetail(id) {
-      // TODO: 书籍详情
+      // 书籍详情
+      this.$router.push({
+        path: "/book/" + id,
+      });
     },
   },
 };

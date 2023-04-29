@@ -49,6 +49,13 @@ const routes = [
                 meta: {
                     title: '用户中心'
                 }
+            },
+            {
+                path: '/book/:bookId',
+                component: () => import("@/views/bookInfo"),
+                meta: {
+                    title: '书籍详情'
+                }
             }
         ]
     },
