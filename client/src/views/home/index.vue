@@ -4,7 +4,7 @@
     <div class="homeCard">
       <div class="cardHeader">
         <span>最新上架二手书籍</span>
-        <el-button type="text" class="more"
+        <el-button type="text" class="more" @click="more(1)"
           >更多<i class="el-icon-d-arrow-right el-icon--right"></i
         ></el-button>
       </div>
@@ -13,7 +13,7 @@
     <div class="homeCard">
       <div class="cardHeader">
         <span>热门二手书籍</span>
-        <el-button type="text" class="more"
+        <el-button type="text" class="more" @click="more(2)"
           >更多<i class="el-icon-d-arrow-right el-icon--right"></i
         ></el-button>
       </div>
@@ -25,7 +25,7 @@
 <script>
 import Banner from "@/components/Banner";
 import CardList from "@/components/CardList";
-import { $bannerList, $newBookList, $hotBookList } from "@/api/home";
+import { $bannerList, $bookList } from "@/api/home";
 export default {
   name: "home",
   components: {
@@ -41,8 +41,7 @@ export default {
   },
   created() {
     this.getBannerList();
-    this.getNewBookList();
-    this.getHotBookList();
+    this.getBookList();
   },
   methods: {
     getBannerList() {
@@ -50,14 +49,18 @@ export default {
         this.bannerList = res.data;
       });
     },
-    getNewBookList() {
-      $newBookList().then((res) => {
-        this.newBookList = res.data;
+    getBookList() {
+      $bookList().then((res) => {
+        this.newBookList = res.data.new;
+        this.hotBookList = res.data.hot;
       });
     },
-    getHotBookList() {
-      $hotBookList().then((res) => {
-        this.hotBookList = res.data;
+    more(type) {
+      this.$router.push({
+        path: "/books",
+        params: {
+          type: type,
+        },
       });
     },
   },

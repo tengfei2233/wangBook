@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author feige
@@ -33,7 +35,7 @@ public class UserIndexController {
     @ApiOperation("轮播图")
     @GetMapping("/banner")
     public R<List<BannerVo>> getBannerList(@ApiParam("所需轮播图数量，默认4")
-                                     @RequestParam(value = "count", defaultValue = "4") Integer count) {
+                                           @RequestParam(value = "count", defaultValue = "4") Integer count) {
 
         return R.ok("请求成功", indexService.getBannerList(count));
     }
@@ -41,18 +43,29 @@ public class UserIndexController {
 
     @ApiOperation("最新书籍")
     @GetMapping("/newBooks")
-    public R<List<BookVo>> getNewBooksList(@ApiParam("所需最新书籍数量，默认4")
-                                     @RequestParam(value = "count", defaultValue = "4") Integer count) {
+    public R<List<BookVo>> getNewBooksList(@ApiParam("所需最新书籍数量，默认5")
+                                           @RequestParam(value = "count", defaultValue = "5") Integer count) {
 
         return R.ok("请求成功", indexService.getNewBooksList(count));
     }
 
     @ApiOperation("热门书籍")
     @GetMapping("/hotBooks")
-    public R<List<BookVo>> getHotBooksList(@ApiParam("所需热门书籍数量，默认4")
-                                     @RequestParam(value = "count", defaultValue = "4") Integer count) {
+    public R<List<BookVo>> getHotBooksList(@ApiParam("所需热门书籍数量，默认5")
+                                           @RequestParam(value = "count", defaultValue = "5") Integer count) {
 
         return R.ok("请求成功", indexService.getHotBooksList(count));
+    }
+
+
+    @ApiOperation("首页书籍")
+    @GetMapping("/book")
+    public R<Map<String, List<BookVo>>> getBookList(@ApiParam("书籍数量，默认5")
+                                                    @RequestParam(value = "count", defaultValue = "5") Integer count) {
+        Map<String, List<BookVo>> map = new HashMap<>();
+        map.put("hot", indexService.getHotBooksList(count));
+        map.put("new", indexService.getNewBooksList(count));
+        return R.ok("请求成功", map);
     }
 
 }

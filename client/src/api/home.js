@@ -11,21 +11,10 @@ export function $bannerList(count) {
     })
 }
 
-// 获取轮播图列表
-export function $hotBookList(count) {
+// 获取书籍列表{最新,热门}
+export function $bookList(count) {
     return request({
-        url: '/index/hotBooks',
-        method: 'get',
-        params: {
-            count: count
-        }
-    })
-}
-
-// 获取轮播图列表
-export function $newBookList(count) {
-    return request({
-        url: '/index/newBooks',
+        url: '/index/book',
         method: 'get',
         params: {
             count: count

@@ -213,7 +213,7 @@ export default {
 .courseImg {
   display: block;
   margin: auto;
-  width: 120px;
-  height: 60px;
+  width: 60px;
+  height: 120px;
 }
 </style>

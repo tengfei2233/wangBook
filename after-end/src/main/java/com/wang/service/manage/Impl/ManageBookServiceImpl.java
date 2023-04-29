@@ -78,16 +78,18 @@ public class ManageBookServiceImpl implements ManageBookService {
                     .select(BookType::getTypeId)
                     .eq(BookType::getBookId, item.getBookId()));
             String typeName;
-            if (ObjUtil.isNotNull(typeName = map.get(bookType.getTypeId()))) {
-            } else {
-                Type type = typeMapper.selectOne(new LambdaQueryWrapper<Type>()
-                        .select(Type::getTypeName)
-                        .eq(Type::getTypeId, bookType.getTypeId()));
-                typeName = type.getTypeName();
-                map.put(bookType.getTypeId(), type.getTypeName());
+            if (ObjUtil.isNotNull(bookType)) {
+                if (ObjUtil.isNotNull(typeName = map.get(bookType.getTypeId()))) {
+                } else {
+                    Type type = typeMapper.selectOne(new LambdaQueryWrapper<Type>()
+                            .select(Type::getTypeName)
+                            .eq(Type::getTypeId, bookType.getTypeId()));
+                    typeName = type.getTypeName();
+                    map.put(bookType.getTypeId(), type.getTypeName());
+                }
+                item.setTypeId(bookType.getTypeId());
+                item.setTypeName(typeName);
             }
-            item.setTypeId(bookType.getTypeId());
-            item.setTypeName(typeName);
         });
         map.clear();
         return PageData.build(bookPage.getTotal(), bookVos);

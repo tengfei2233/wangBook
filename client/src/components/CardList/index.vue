@@ -2,14 +2,13 @@
   <div class="course-list flex-r-start flex-wrap" style="width: 100%">
     <div
       class="item"
-      style="box-sizing: border-box; padding: 20px; flexbasis: 20%"
       v-for="book in bookList"
       :key="book.bookId"
       @click="toDetail(book.bookId)"
     >
       <el-card>
         <div class="img-container">
-          <el-image style="width: 100%; height: 155px" :src="book.bookCover">
+          <el-image style="width: 100%; height: 180px" :src="book.bookCover">
             <div slot="error" class="image-slot">
               <i class="el-icon-picture-outline"></i>
             </div>
@@ -37,21 +36,24 @@ export default {
   },
   methods: {
     toDetail(id) {
-      this.$emit("click", id);
+      // TODO: 书籍详情
     },
   },
 };
 </script>
   
-  <style>
+  <style scoped>
+.item {
+  box-sizing: border-box;
+  padding: 10px 45px;
+  flex-basis: 20%;
+}
 .course-list .el-card {
   border-radius: 10px !important;
-  /* margin-right: 40px;
-    margin-top: 40px; */
   cursor: pointer;
 }
-.course-list .el-card .el-card__body {
-  padding: 0 0 20px 0 !important;
+::v-deep .el-card__body {
+  padding: 0 !important;
 }
 .img-container {
   position: relative;
@@ -80,6 +82,21 @@ export default {
   justify-content: center;
   align-items: center;
   font-size: 32px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-rb {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.flex-r-start {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
 }
 </style>
   
