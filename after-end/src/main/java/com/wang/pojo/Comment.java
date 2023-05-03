@@ -46,9 +46,4 @@ public class Comment extends BaseEntity {
     */
     private Date cmDate;
 
-    /**
-    * 0：删除，1：正常
-    */
-    private Integer status;
-
 }

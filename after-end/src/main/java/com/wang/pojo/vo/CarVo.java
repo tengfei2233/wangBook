@@ -16,6 +16,9 @@ import java.math.BigDecimal;
 @ApiModel("购物车视图对象")
 public class CarVo {
 
+    @ApiModelProperty("id")
+    private Long id;
+
     @ApiModelProperty("订单价格")
     private BigDecimal orderPrice;
 

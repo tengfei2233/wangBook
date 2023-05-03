@@ -9,6 +9,7 @@ import com.wang.pojo.vo.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,13 +31,15 @@ public interface UserBookService {
 
     Boolean addCar(AddOrderBo bo);
 
-    String buyBook(AddOrderBo bo);
+    String buyBook(AddOrderBo bo,String token);
 
-    void returnUrl(HttpServletRequest request, HttpServletResponse response);
-
-    String notifyUrl(HttpServletRequest request) throws AlipayApiException;
+    void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException;
 
     PageData<OrderVo> orderList(PageQuery pageQuery);
 
     PageData<CarVo> carList(PageQuery pageQuery);
+
+    Boolean delCar(Long id);
+
+    Boolean delOrder(Long orderId);
 }

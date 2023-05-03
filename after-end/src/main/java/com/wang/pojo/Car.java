@@ -15,9 +15,14 @@ public class Car {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 书籍id
+     * id
      */
     @TableId
+    private Long id;
+
+    /**
+     * 书籍id
+     */
     private Long bookId;
 
     /**

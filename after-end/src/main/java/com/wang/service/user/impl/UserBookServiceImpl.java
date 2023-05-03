@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wang.config.properties.AlipayProperties;
+import com.wang.exception.BookException;
+import com.wang.exception.OrderException;
 import com.wang.mapper.*;
 import com.wang.pojo.*;
 import com.wang.pojo.bo.AddOrderBo;
@@ -20,6 +22,7 @@ import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.*;
 import com.wang.service.user.UserBookService;
+import com.wang.utils.JwtUtil;
 import com.wang.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,6 +62,8 @@ public class UserBookServiceImpl implements UserBookService {
     private AlipayProperties alipayProperties;
     @Resource
     private CarMapper carMapper;
+    @Resource
+    private JwtUtil jwtUtil;
 
     @Override
     public List<TypeVo> getTypeList() {
@@ -138,6 +142,7 @@ public class UserBookServiceImpl implements UserBookService {
                 child.setUsername(user2.getUsername());
                 child.setAvatar(user2.getAvatar());
             });
+            comment.setChildComment(childCommentVos);
         });
         return PageData.build(commentPage.getTotal(), commentVos);
     }
@@ -145,25 +150,27 @@ public class UserBookServiceImpl implements UserBookService {
     @Override
     public Boolean setComment(CommentBo bo) {
         // 父评论id是否为0，为0代表是根评论
+        // TODO 待写
         if (ObjectUtil.isNull(bo)) {
             return false;
         }
-        if (bo.getBookId().intValue() != 0) {
+        if (ObjUtil.isNotNull(bo.getCmParentId()) && !bo.getCmParentId().equals(0L)) {
             // 获取父评论是否存在
             Comment comment = commentMapper.selectOne(new LambdaQueryWrapper<Comment>()
                     .select(Comment::getStatus)
                     .eq(Comment::getCmId, bo.getCmParentId()));
-            if (comment.getStatus().intValue() == 0) {
+            if (comment.getStatus() == 0) {
                 return false;
             }
         }
         Comment comment = BeanUtil.copyProperties(bo, Comment.class);
-        comment.setCmParentId(bo.getCmParentId());
+        comment.setCmParentId(ObjUtil.isNotNull(bo.getCmParentId()) ? bo.getCmParentId() : 0L);
         comment.setCmDate(new Date());
+        comment.setStatus(1);
         // 获取用户id
         comment.setUserId(SecurityUtil.getUserId());
         int insert = commentMapper.insert(comment);
-        return insert == 1;
+        return insert >= 1;
     }
 
     @Override
@@ -173,15 +180,36 @@ public class UserBookServiceImpl implements UserBookService {
         }
         Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
                 .eq(Book::getBookId, bo.getBookId()));
-        if (ObjectUtil.isNull(book) || book.getStatus().intValue() == 0) {
+        if (ObjectUtil.isNull(book) || book.getStatus() == 0) {
             return false;
         }
-        // TODO 加入redis
-        return null;
+        if (bo.getOrderNum() > book.getBookStock() || bo.getOrderNum() <= 0) {
+            throw new BookException("库存不足|购物数量少于1");
+        }
+        Long userId = SecurityUtil.getUserId();
+        Car car = carMapper.selectOne(new LambdaQueryWrapper<Car>()
+                .eq(Car::getBookId, bo.getBookId())
+                .eq(Car::getUserId, userId));
+        int res = 0;
+        if (ObjUtil.isNotNull(car)) {
+            car.setOrderNum(car.getOrderNum() + bo.getOrderNum());
+            res = carMapper.updateById(car);
+        } else {
+            car = new Car();
+            car.setOrderNum(bo.getOrderNum());
+            car.setBookId(bo.getBookId());
+            car.setUserId(userId);
+            res = carMapper.insert(car);
+        }
+        return res >= 1;
     }
 
     @Override
-    public String buyBook(AddOrderBo bo) {
+    public String buyBook(AddOrderBo bo, String token) {
+        Long userId = jwtUtil.getUserId(token);
+        if (ObjUtil.isNull(userId)) {
+            return "请登录";
+        }
         if (ObjectUtil.isNull(bo)) {
             return "请传入非空信息";
         }
@@ -197,7 +225,7 @@ public class UserBookServiceImpl implements UserBookService {
         Order order = new Order();
         order.setBookId(bo.getBookId());
         // 用户id
-        order.setUserId(SecurityUtil.getUserId());
+        order.setUserId(userId);
         order.setOrderDate(new Date());
         order.setOrderNum(bo.getOrderNum());
         order.setStatus(0);
@@ -257,23 +285,9 @@ public class UserBookServiceImpl implements UserBookService {
      * @param response
      * @throws IOException
      */
-    public void returnUrl(HttpServletRequest request, HttpServletResponse response) {
+    public void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException {
         log.info("=================================同步回调=====================================");
         // TODO 进行相应的操作
-
-    }
-
-    /**
-     * 异步回调
-     *
-     * @param request
-     * @return
-     * @throws UnsupportedEncodingException
-     * @throws AlipayApiException
-     */
-    public String notifyUrl(HttpServletRequest request) throws AlipayApiException {
-        log.info("=================================异步回调=====================================");
-        // 获取支付宝GET过来反馈信息
         Map<String, String> params = new HashMap<>();
         Map<String, String[]> requestParams = request.getParameterMap();
         for (String name : requestParams.keySet()) {
@@ -282,32 +296,14 @@ public class UserBookServiceImpl implements UserBookService {
         boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayProperties.getAlipayPublicKey(), "UTF-8", alipayProperties.getSignType()); // 调用SDK验证签名
         //验证签名通过
         if (signVerified) {
-            log.info("交易名称: " + params.get("subject"));
-            log.info("交易状态: " + params.get("trade_status"));
-            log.info("支付宝交易凭证号: " + params.get("trade_no"));
-            log.info("商户订单号: " + params.get("out_trade_no"));
-            log.info("交易金额: " + params.get("total_amount"));
-            log.info("买家在支付宝唯一id: " + params.get("buyer_id"));
-            log.info("买家付款时间: " + params.get("gmt_payment"));
-            log.info("买家付款金额: " + params.get("buyer_pay_amount"));
-            log.info("重定向URL: " + params.get("body"));
-
             // TODO 支付成功，修改数据库等信息
             Integer res = orderMapper.update(null, new LambdaUpdateWrapper<Order>()
                     .set(Order::getBuyDate, new Date())
                     .set(Order::getAlipayNo, params.get("trade_no"))
-                    .set(Order::getStatus, 1));
-            if (res >= 1) {
-                //跳转付款成功页面
-                return "ok";
-            }
-            // 支付宝失败退款
-            //跳转付款失败页面
-            return "no";
-        } else {
-            //跳转付款失败页面
-            return "no";
+                    .set(Order::getStatus, 1)
+                    .eq(Order::getOrderId, params.get("out_trade_no")));
         }
+        response.sendRedirect("http://localhost:88/orders");
     }
 
     @Override
@@ -316,15 +312,17 @@ public class UserBookServiceImpl implements UserBookService {
         List<OrderVo> orders = new ArrayList<>(orderPage.getRecords().size());
         orderPage.getRecords().forEach(order -> {
             Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
-                    .select(Book::getBookName, Book::getBookCover)
+                    .select(Book::getBookName, Book::getBookCover, Book::getBookAuthor, Book::getBookIsbn)
                     .eq(Book::getBookId, order.getBookId()));
             OrderVo orderVo = new OrderVo();
-            orderVo.setOrderId(orderVo.getOrderId());
+            orderVo.setOrderId(order.getOrderId());
             orderVo.setBookId(order.getBookId());
             orderVo.setOrderNum(order.getOrderNum());
             orderVo.setStatus(order.getStatus());
             orderVo.setBookName(book.getBookName());
             orderVo.setBookCover(book.getBookCover());
+            orderVo.setBookAuthor(book.getBookAuthor());
+            orderVo.setBookIsbn(book.getBookIsbn());
             orderVo.setOrderDate(order.getOrderDate());
             orderVo.setBuyDate(order.getBuyDate());
             orderVo.setOrderPrice(order.getOrderPrice());
@@ -344,6 +342,7 @@ public class UserBookServiceImpl implements UserBookService {
                             Book::getBookIsbn, Book::getBookPrice)
                     .eq(Book::getBookId, car.getBookId()));
             CarVo carVo = new CarVo();
+            carVo.setId(car.getId());
             carVo.setBookId(car.getBookId());
             carVo.setBookName(book.getBookName());
             carVo.setBookAuthor(book.getBookAuthor());
@@ -356,6 +355,24 @@ public class UserBookServiceImpl implements UserBookService {
         });
 
         return PageData.build(carPage.getTotal(), cars);
+    }
+
+    @Override
+    public Boolean delCar(Long id) {
+        if (ObjUtil.isNull(id)) {
+            throw new OrderException("id为空");
+        }
+        int i = carMapper.deleteById(id);
+        return i >= 1;
+    }
+
+    @Override
+    public Boolean delOrder(Long orderId) {
+        if (ObjUtil.isNull(orderId)) {
+            throw new OrderException("订单id为空");
+        }
+        int i = orderMapper.deleteById(orderId);
+        return i >= 1;
     }
 
 

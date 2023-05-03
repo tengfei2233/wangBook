@@ -59,21 +59,16 @@ public class UserBookController {
     }
 
     @ApiOperation("购买书籍")
-    @GetMapping(value = "/buyBook", produces = "text/html;charset=UTF-8")
-    public String buyBook(@RequestParam AddOrderBo bo) {
-        return bookService.buyBook(bo);
+    @GetMapping(value = "/buyBook")
+    public String buyBook(AddOrderBo bo, String token) {
+        return bookService.buyBook(bo, token);
     }
+
 
     @ApiOperation("付款成功同步回调")
     @GetMapping("/syncNotify")
-    public void returnUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException {
         bookService.returnUrl(request, response);
-    }
-
-    @ApiOperation("付款成功异步回调")
-    @PostMapping("/asyncNotify")
-    public String notifyUrl(HttpServletRequest request) throws AlipayApiException {
-        return bookService.notifyUrl(request);
     }
 
     @ApiOperation("购物车列表")
@@ -82,10 +77,22 @@ public class UserBookController {
         return R.ok("请求成功", bookService.carList(pageQuery));
     }
 
+    @ApiOperation("删除购物车")
+    @PostMapping("/delCar")
+    public R<Void> delCar(@RequestParam @ApiParam("id") Long id) {
+        return bookService.delCar(id) ? R.ok("删除成功") : R.ok("删除失败");
+    }
+
     @ApiOperation("订单列表")
     @GetMapping("/orders")
     public R<PageData<OrderVo>> getOrderList(PageQuery pageQuery) {
-        return R.ok("请求成功", bookService.orderList( pageQuery));
+        return R.ok("请求成功", bookService.orderList(pageQuery));
+    }
+
+    @ApiOperation("删除订单")
+    @PostMapping("/delOrder")
+    public R<Void> delOrder(@RequestParam @ApiParam("orderId") Long orderId) {
+        return bookService.delOrder(orderId) ? R.ok("删除成功") : R.ok("删除失败");
     }
 
     @ApiOperation("评论列表")

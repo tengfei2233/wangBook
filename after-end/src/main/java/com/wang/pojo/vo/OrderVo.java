@@ -42,6 +42,12 @@ public class OrderVo {
     @ApiModelProperty("书籍封面")
     private String bookCover;
 
+    @ApiModelProperty("书籍作者")
+    private String bookAuthor;
+
+    @ApiModelProperty("ISBN号")
+    private String bookIsbn;
+
     @ApiModelProperty("订单状态,1:已付款,0:未付款")
     private Integer status;
 
