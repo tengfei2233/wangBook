@@ -119,7 +119,7 @@ public class UserBookServiceImpl implements UserBookService {
                 .eq(Comment::getStatus, 1)
                 .eq(Comment::getCmParentId, 0L)
                 .orderByDesc(Comment::getCmDate));
-        // TODO　给每条评论设置设置用户信息
+        //　给每条评论设置设置用户信息
         List<CommentVo> commentVos = BeanUtil.copyToList(commentPage.getRecords(), CommentVo.class);
         commentVos.stream().forEach(comment -> {
             User user = userMapper.selectOne(new LambdaQueryWrapper<User>()

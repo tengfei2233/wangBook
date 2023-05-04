@@ -36,6 +36,9 @@ public class CommentVo {
     @ApiModelProperty("书籍id")
     private Long bookId;
 
+    @ApiModelProperty("书籍名称")
+    private String bookName;
+
     @ApiModelProperty("评论内容")
     private String cmContent;
 

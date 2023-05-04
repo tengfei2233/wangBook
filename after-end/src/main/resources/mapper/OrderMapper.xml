@@ -22,11 +22,11 @@
         from (select * from tb_order
         <where>
             <if test="bo.status!=null">
-                status= '%${bo.status}%'
+                status= '${bo.status}'
             </if>
         </where>
         ) o
-        join (select user_id, username, phone from tb_user where phone = '%${bo.val}%' or username like '%${bo.val}%') u
+        join (select user_id, username, phone from tb_user where phone = '${bo.val}' or username like '${bo.val}') u
         on u.user_id = o.user_id order by o.order_date desc
     </select>
     <select id="selectOrderListByBook" resultType="com.wang.pojo.vo.ManOrderVo">
@@ -34,10 +34,10 @@
         from (select * from tb_order
         <where>
             <if test="bo.status!=null">
-                status= '%${bo.status}%'
+                status= '${bo.status}'
             </if>
         </where>
-        ) o join (select book_id,book_name,book_cover from tb_book where book_name like '%${bo.val}%') b
+        ) o join (select book_id,book_name,book_cover from tb_book where book_name like '%${bo.val}%') b on
         b.book_id=o.book_id order by o.order_date desc
     </select>
 

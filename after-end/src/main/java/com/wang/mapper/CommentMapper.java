@@ -1,7 +1,12 @@
 package com.wang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wang.pojo.Comment;
+import com.wang.pojo.bo.CommentSearchBo;
+import com.wang.pojo.vo.CommentVo;
+import com.wang.pojo.vo.ManOrderVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,4 +18,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentMapper extends BaseMapper<Comment> {
+    Page<CommentVo> selectPageByBook(@Param("bo") CommentSearchBo searchBo, Page<ManOrderVo> build);
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wang.mapper.CommentMapper">
+
+
+    <select id="selectPageByBook" resultType="com.wang.pojo.vo.CommentVo">
+        select c.*,b.book_name from (select * from tb_comment where status=1 and cm_parent_id=0 order by cm_date desc) c
+        join (
+        select book_id,book_name from tb_book
+        <where>
+            <if test="bo.pattern==1">
+                book_name like CONCAT('%','${bo.val}','%' )
+            </if>
+            <if test="bo.pattern==2">
+                book_isbn = '${bo.val}'
+            </if>
+        </where>
+        ) b on c.book_id=b.book_id
+    </select>
+</mapper>

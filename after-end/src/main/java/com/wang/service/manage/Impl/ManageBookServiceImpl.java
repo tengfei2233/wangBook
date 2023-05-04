@@ -165,7 +165,10 @@ public class ManageBookServiceImpl implements ManageBookService {
     public PageData<ManOrderVo> getOrderList(OrderSearchBo searchBo, PageQuery pageQuery) {
         if (ObjUtil.isNotNull(searchBo.getVal()) && ObjUtil.isNotNull(searchBo.getPattern())) {
             Page<ManOrderVo> manOrderVos = null;
-            if (searchBo.getPattern() == 2) {
+            if (searchBo.getPattern() == 1) {
+                // 按订单id搜索
+                return getByOrderId(searchBo, pageQuery);
+            } else if (searchBo.getPattern() == 2) {
                 // 按用户名/手机号搜索
                 manOrderVos = orderMapper.selectOrderListByUser(pageQuery.build(), searchBo);
                 // 添加书籍信息
@@ -176,7 +179,8 @@ public class ManageBookServiceImpl implements ManageBookService {
                     item.setBookCover(book.getBookCover());
                     item.setBookName(book.getBookName());
                 });
-            } else {
+            } else if (searchBo.getPattern() == 3) {
+                // 按书籍名称搜索
                 manOrderVos = orderMapper.selectOrderListByBook(pageQuery.build(), searchBo);
                 // 添加用户信息
                 manOrderVos.getRecords().forEach(item -> {
@@ -190,29 +194,34 @@ public class ManageBookServiceImpl implements ManageBookService {
             return PageData.build(manOrderVos.getTotal(), manOrderVos.getRecords());
         } else {
             // 按订单id搜索
-            Page<Order> orderPage = orderMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Order>()
-                    .eq(ObjUtil.isNotNull(searchBo.getPattern()) && searchBo.getPattern() == 1 && ObjUtil.isNotNull(searchBo.getVal())
-                            , Order::getOrderId, searchBo.getVal())
-                    .eq(ObjUtil.isNotNull(searchBo.getStatus()), Order::getStatus, searchBo.getStatus())
-                    .orderByDesc(Order::getOrderDate));
-            List<ManOrderVo> orderList = new ArrayList<>(orderPage.getRecords().size());
-            orderPage.getRecords().forEach(order -> {
-                ManOrderVo orderVo = BeanUtil.copyProperties(order, ManOrderVo.class);
-                // 查询用户信息
-                User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                        .select(User::getUsername)
-                        .eq(User::getUserId, order.getOrderId()));
-                orderVo.setUsername(user.getUsername());
-                // 查询书籍信息
-                Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
-                        .select(Book::getBookName, Book::getBookCover)
-                        .eq(Book::getBookId, order.getBookId()));
-                orderVo.setBookName(book.getBookName());
-                orderVo.setBookCover(book.getBookCover());
-                orderList.add(orderVo);
-            });
-            return PageData.build(orderPage.getTotal(), orderList);
+            return getByOrderId(searchBo, pageQuery);
         }
+    }
+
+    private PageData<ManOrderVo> getByOrderId(OrderSearchBo searchBo, PageQuery pageQuery) {
+        Page<Order> orderPage = orderMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Order>()
+                .eq(ObjUtil.isNotNull(searchBo.getPattern()) && searchBo.getPattern() == 1 && ObjUtil.isNotNull(searchBo.getVal())
+                        , Order::getOrderId, searchBo.getVal())
+                .eq(ObjUtil.isNotNull(searchBo.getStatus()), Order::getStatus, searchBo.getStatus())
+                .orderByDesc(Order::getOrderDate));
+        List<ManOrderVo> orderList = new ArrayList<>(orderPage.getRecords().size());
+        orderPage.getRecords().forEach(order -> {
+            ManOrderVo orderVo = BeanUtil.copyProperties(order, ManOrderVo.class);
+            // 查询用户信息
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .select(User::getUsername, User::getPhone)
+                    .eq(User::getUserId, order.getUserId()));
+            orderVo.setUsername(user.getUsername());
+            orderVo.setPhone(user.getPhone());
+            // 查询书籍信息
+            Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
+                    .select(Book::getBookName, Book::getBookCover)
+                    .eq(Book::getBookId, order.getBookId()));
+            orderVo.setBookName(book.getBookName());
+            orderVo.setBookCover(book.getBookCover());
+            orderList.add(orderVo);
+        });
+        return PageData.build(orderPage.getTotal(), orderList);
     }
 
     @Override

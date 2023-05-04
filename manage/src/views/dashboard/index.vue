@@ -32,14 +32,40 @@ export default {
           type: "category",
           data: [],
         },
-        yAxis: {
-          type: "value",
-        },
+        yAxis: [
+          {
+            type: "value",
+            name: "销售量",
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: "#fac858",
+              },
+            },
+            axisLabel: {
+              formatter: "{value} 本",
+            },
+          },
+          {
+            type: "value",
+            name: "销售额",
+            axisLine: {
+              show: true,
+              lineStyle: {
+                color: "#91cc75",
+              },
+            },
+            axisLabel: {
+              formatter: "{value} 元",
+            },
+          },
+        ],
         series: [
           {
             data: [],
             name: "销售量",
             type: "line",
+            yAxisIndex: 0,
             itemStyle: {
               normal: {
                 color: "#fac858",
@@ -47,10 +73,11 @@ export default {
             },
           },
           {
+            data: [],
             name: "销售额",
             type: "bar",
             barWidth: "50%",
-            data: [],
+            yAxisIndex: 1,
             itemStyle: {
               normal: {
                 color: "#91cc75",
