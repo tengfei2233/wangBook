@@ -25,14 +25,13 @@
         :class="params.sortType == 2 ? 'check_btn' : ''"
         >最新</el-button
       >
-      <el-divider direction="vertical"></el-divider>
+      <!-- <el-divider direction="vertical"></el-divider>
       <el-button
         type="text"
         @click="checkSortType(3)"
         :class="params.sortType == 3 ? 'check_btn' : ''"
         >最热</el-button
-      >
-      <el-divider direction="vertical"></el-divider>
+      > -->
     </div>
     <div class="book_search">
       <el-form

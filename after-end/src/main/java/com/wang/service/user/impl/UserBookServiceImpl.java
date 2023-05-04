@@ -85,6 +85,8 @@ public class UserBookServiceImpl implements UserBookService {
                 bookIds = bookTypes.stream()
                         .map(BookType::getBookId)
                         .collect(Collectors.toList());
+            } else {
+                return PageData.build(0L, null);
             }
         }
         Page<Book> bookPage = bookMapper.selectPage(pageQuery.build(), new LambdaQueryWrapper<Book>()
@@ -96,9 +98,9 @@ public class UserBookServiceImpl implements UserBookService {
                             .eq(searchBo.getPattern() == 2, Book::getBookAuthor, searchBo.getKey())
                             .eq(searchBo.getPattern() == 3, Book::getBookIsbn, searchBo.getKey());
                 })
+                .orderByDesc(ObjUtil.isNotNull(searchBo.getSortType()) && searchBo.getSortType() == 2, Book::getBookAddDate)
         );
         List<BookVo> bookVos = BeanUtil.copyToList(bookPage.getRecords(), BookVo.class);
-
         return PageData.build(bookPage.getTotal(), bookVos);
     }
 
