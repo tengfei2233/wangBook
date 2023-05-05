@@ -4,6 +4,7 @@ import com.wang.exception.AccessDeniedHandlerImpl;
 import com.wang.exception.AuthenticationEntryPointImpl;
 import com.wang.service.JwtAuthenticationTokenFilter;
 import com.wang.service.LogoutService;
+import com.wang.utils.AesPasswordEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,7 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -79,7 +79,7 @@ public class SpringSecurityConfig {
                         // 支付
                         .antMatchers("/user/book/buyBook", "/user/book/asyncNotify","/user/book/syncNotify").permitAll()
                         // 方形接口（具体匹配接口放上面，防止匹配顺序问题）
-                        .antMatchers("/user/login/login", "/user/login/getCaptcha", "/manage/login/login").permitAll()
+                        .antMatchers("/user/login/**", "/manage/login/login").permitAll()
                         // 普通用户接口 TODO hasRole会给权限字符串加上 ROLE_ 前缀，hasAnyAuthority不会
                         .antMatchers("/user/**").hasAuthority("0")
                         // 管理员接口
@@ -103,7 +103,7 @@ public class SpringSecurityConfig {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new AesPasswordEncoder();
     }
 
     /**

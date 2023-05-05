@@ -2,7 +2,7 @@
   <div id="container">
     <div id="login-container">
       <p id="title">用户登录</p>
-      <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tabs v-model="activeName">
         <el-tab-pane label="账号密码登录" name="first">
           <el-form ref="loginForm" :model="loginForm" :rules="rules1">
             <el-form-item label prop="username">
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { $getCaptcha, $login } from "@/api/me";
+import { $getCaptcha, $login, $getCode, $phoneLogin } from "@/api/login";
 import Register from "@/components/Register";
 import { setToken } from "@/utils/auth";
 export default {
@@ -176,7 +176,6 @@ export default {
     this.getCaptcha();
   },
   methods: {
-    handleClick() {},
     login() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
@@ -188,7 +187,17 @@ export default {
         }
       });
     },
-    phoneLogin() {},
+    phoneLogin() {
+      this.$refs.phoneLoginForm.validate((valid) => {
+        if (valid) {
+          $phoneLogin(this.phoneLoginForm).then((res) => {
+            setToken(res.data.token);
+            this.$notify.success(res.msg);
+            this.$router.push({ path: "/home" });
+          });
+        }
+      });
+    },
     getCaptcha() {
       $getCaptcha().then((res) => {
         this.loginForm.uuid = res.data.uuid;
@@ -200,6 +209,12 @@ export default {
       const isPhone = phone != "" && /^1(3|4|5|7|8|9)\d{9}$/.test(phone);
       if (isPhone) {
         let time = 60;
+        $getCode(phone).then((res) => {
+          this.$message.success({
+            message: "验证码为：" + res.data + "，测试使用，有效期十分钟",
+            duration: 3000,
+          });
+        });
         let interval = window.setInterval(() => {
           this.phoneCodeBtn.msg = "请" + time + "后再获取";
           this.phoneCodeBtn.disabled = true;
@@ -211,7 +226,7 @@ export default {
           }
         }, 1000);
       } else {
-        this.$message.error("请输入正确的手机号");
+        this.$notify.error("请输入正确的手机号");
       }
     },
     openRegister() {

@@ -3,6 +3,8 @@ package com.wang.controller.user;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import com.wang.pojo.bo.LoginBo;
+import com.wang.pojo.bo.PhoneLoginBo;
+import com.wang.pojo.bo.UserRegisterBo;
 import com.wang.service.user.UserLoginService;
 import com.wang.utils.CaptchaUtil;
 import com.wang.utils.R;
@@ -10,6 +12,7 @@ import com.wang.utils.RedisKey;
 import com.wang.utils.RedisUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -39,7 +42,13 @@ public class UserLoginController {
     @ApiOperation("登录方法")
     @PostMapping("/login")
     public R<Map<String, String>> login(@RequestBody LoginBo bo) {
-        return R.ok("登录成功",loginService.login(bo));
+        return R.ok("登录成功", loginService.login(bo));
+    }
+
+    @ApiOperation("手机号登录方法")
+    @PostMapping("/phoneLogin")
+    public R<Map<String, String>> phoneLogin(@RequestBody PhoneLoginBo bo) {
+        return R.ok("登录成功", loginService.phoneLogin(bo));
     }
 
 
@@ -59,6 +68,19 @@ public class UserLoginController {
         map.put("uuid", uuid);
         map.put("captcha", captchaDrawer.getImageBase64Data());
         return R.ok("请求成功", map);
+    }
+
+    @ApiOperation("获取手机验证码")
+    @PostMapping("/getCode")
+    public R<String> getCode(@RequestParam("phone") @ApiParam("手机号") String phone) {
+        return R.ok("获取成功", loginService.getCode(phone));
+    }
+
+
+    @ApiOperation("注册")
+    @PostMapping("/register")
+    public R<Void> register(@RequestBody UserRegisterBo bo) {
+        return loginService.register(bo)?R.ok("注册成功"):R.fail("注册失败");
     }
 
 }

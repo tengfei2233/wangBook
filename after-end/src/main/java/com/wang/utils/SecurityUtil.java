@@ -4,7 +4,6 @@ import com.wang.exception.UserException;
 import com.wang.pojo.LoginUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * @Author: tengfei
@@ -35,7 +34,7 @@ public class SecurityUtil {
     }
 
     public static String encryptPassword(String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        AesPasswordEncoder passwordEncoder = new AesPasswordEncoder();
         return passwordEncoder.encode(password);
     }
 
@@ -47,8 +46,13 @@ public class SecurityUtil {
      * @return 结果
      */
     public static boolean matchesPassword(String rawPassword, String encodedPassword) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        AesPasswordEncoder passwordEncoder = new AesPasswordEncoder();
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    public static String decodePassword(String rawPassword) {
+        AesPasswordEncoder passwordEncoder = new AesPasswordEncoder();
+        return passwordEncoder.decode(rawPassword);
     }
 
 }

@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { $logout } from "@/api/me";
+import { $logout } from "@/api/login";
 import { removeToken } from "@/utils/auth";
 export default {
   name: "topBar",

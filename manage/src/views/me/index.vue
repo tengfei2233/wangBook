@@ -193,6 +193,7 @@ export default {
     getUserInfo() {
       $userInfo().then((res) => {
         this.user = res.data;
+        sessionStorage.setItem("avatar", this.user.avatar);
       });
     },
     getPhoneCode() {

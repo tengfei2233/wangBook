@@ -1,6 +1,16 @@
 <template>
-  <el-dialog width="400px" title="用户注册" :visible.sync="isOpen" @close="close">
-    <el-form ref="registerForm" :model="formData" :rules="rules" label-width="80px">
+  <el-dialog
+    width="400px"
+    title="用户注册"
+    :visible.sync="isOpen"
+    @close="close"
+  >
+    <el-form
+      ref="registerForm"
+      :model="formData"
+      :rules="rules"
+      label-width="80px"
+    >
       <el-form-item label="用户名" prop="username">
         <el-input
           v-model="formData.username"
@@ -48,7 +58,7 @@
           show-word-limit
           clearable
           prefix-icon="el-icon-picture-outline"
-          style="width:50%"
+          style="width: 50%"
         ></el-input>
         <div class="phone-code">
           <el-button
@@ -56,7 +66,8 @@
             class="btn"
             :disabled="phoneCodeBtn.disabled"
             @click="getPhoneCode"
-          >{{phoneCodeBtn.msg}}</el-button>
+            >{{ phoneCodeBtn.msg }}</el-button
+          >
         </div>
       </el-form-item>
     </el-form>
@@ -68,13 +79,14 @@
 </template>
 
 <script>
+import { $register, $getCode } from "@/api/login";
 export default {
   name: "Register",
   props: {
     visible: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -83,59 +95,54 @@ export default {
         password: "",
         rePassword: "",
         phone: "",
-        phoneCode: ""
+        phoneCode: "",
       },
       rules: {
         username: [
           {
             required: true,
             message: "请输入用户名",
-            trigger: "blur"
+            trigger: "blur",
           },
-          {
-            pattern: /^[a-zA-Z][0-9]{5,10}$/,
-            message: "请输入5-10位字母开头的用户名",
-            trigger: "blur"
-          }
         ],
         password: [
           {
             required: true,
             message: "请输入密码",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         rePassword: [
           {
             required: true,
             message: "请再次输入密码",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         phone: [
           {
             required: true,
             message: "请输入手机号",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             pattern: /^1(3|4|5|7|8|9)\d{9}$/,
             message: "手机号格式错误",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         phoneCode: [
           {
             required: true,
             message: "请输入验证码",
-            trigger: "blur"
-          }
-        ]
+            trigger: "blur",
+          },
+        ],
       },
       phoneCodeBtn: {
         disabled: false,
-        msg: "获取验证码"
-      }
+        msg: "获取验证码",
+      },
     };
   },
   computed: {
@@ -146,8 +153,8 @@ export default {
       },
       set(val) {
         this.$emit("update:visible", val);
-      }
-    }
+      },
+    },
   },
   methods: {
     close() {
@@ -159,6 +166,12 @@ export default {
       const isPhone = phone != "" && /^1(3|4|5|7|8|9)\d{9}$/.test(phone);
       if (isPhone) {
         let time = 60;
+        $getCode(phone).then((res) => {
+          this.$message.success({
+            message: "验证码为：" + res.data + "，测试使用，有效期十分钟",
+            duration: 3000,
+          });
+        });
         let interval = window.setInterval(() => {
           this.phoneCodeBtn.msg = "请" + time + "后再获取";
           this.phoneCodeBtn.disabled = true;
@@ -174,12 +187,20 @@ export default {
       }
     },
     register() {
-      this.$refs["registerForm"].validate(valid => {
-        if (!valid) return;
-        this.close();
+      this.$refs["registerForm"].validate((valid) => {
+        if (valid) {
+          if (this.formData.password != this.formData.rePassword) {
+            this.$notify.error("两次密码输入不一致");
+          } else {
+            $register(this.formData).then((res) => {
+              this.$notify.success(res.msg);
+              this.close();
+            });
+          }
+        }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

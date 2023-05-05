@@ -193,6 +193,14 @@ export default {
     getUserInfo() {
       $userInfo().then((res) => {
         this.user = res.data;
+        if (this.user.avatar == null) {
+          sessionStorage.setItem(
+            "avatar",
+            require("@/assets/images/avatar.jpg")
+          );
+        } else {
+          sessionStorage.setItem("avatar", this.user.avatar);
+        }
       });
     },
     getPhoneCode() {
@@ -251,8 +259,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .item {
   margin-left: 5px;
 }

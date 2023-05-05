@@ -46,10 +46,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         // 比较密码
         Authentication authentication = AuthenticationContextHolder.getContext();
-        String password = authentication.getCredentials().toString();
-        boolean PwdPass = SecurityUtil.matchesPassword(password, user.getPassword());
-        if (!PwdPass) {
-            throw new UserException("密码错误");
+        // 是否是手机号登录
+        boolean isPhone = authentication.isAuthenticated();
+        if (!isPhone) {
+            String password = authentication.getCredentials().toString();
+            boolean pwdPass = SecurityUtil.matchesPassword(password, user.getPassword());
+            if (!pwdPass) {
+                throw new UserException("密码错误");
+            }
         }
         // TODO 不能设置为空
         // user.setPassword(null);
