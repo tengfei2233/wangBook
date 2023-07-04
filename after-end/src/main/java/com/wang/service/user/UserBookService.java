@@ -31,7 +31,7 @@ public interface UserBookService {
 
     Boolean addCar(AddOrderBo bo);
 
-    String buyBook(AddOrderBo bo,String token);
+    String buyBook(AddOrderBo bo);
 
     void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException;
 

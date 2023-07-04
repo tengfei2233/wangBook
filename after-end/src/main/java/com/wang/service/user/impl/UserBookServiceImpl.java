@@ -207,8 +207,8 @@ public class UserBookServiceImpl implements UserBookService {
     }
 
     @Override
-    public String buyBook(AddOrderBo bo, String token) {
-        Long userId = jwtUtil.getUserId(token);
+    public String buyBook(AddOrderBo bo) {
+        Long userId  = SecurityUtil.getUserId();
         if (ObjUtil.isNull(userId)) {
             return "请登录";
         }

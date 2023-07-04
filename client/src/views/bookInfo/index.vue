@@ -203,7 +203,13 @@
 </template>
 
 <script>
-import { $bookInfo, $addCar, $commonList, $toComment } from "@/api/book";
+import {
+  $bookInfo,
+  $addCar,
+  $commonList,
+  $toComment,
+  $buyBook,
+} from "@/api/book";
 import { getToken } from "@/utils/auth";
 export default {
   name: "bookInfo",
@@ -273,7 +279,7 @@ export default {
         });
       }
     },
-    toBuy(bookId) {
+    async toBuy(bookId) {
       if (
         this.order.orderNum < 0 ||
         this.order.orderNum > this.book.bookStock
@@ -281,15 +287,24 @@ export default {
         this.$notify.warning("库存不足");
       } else {
         this.order.bookId = bookId;
-        window.open(
-          "http://localhost:8888/user/book/buyBook?bookId=" +
-            bookId +
-            "&orderNum=" +
-            this.order.orderNum +
-            "&token=" +
-            getToken(),
-          "_blank"
-        );
+        // window.open(
+        //   "http://localhost:8888/user/book/buyBook?bookId=" +
+        //     bookId +
+        //     "&orderNum=" +
+        //     this.order.orderNum +
+        //     "&token=" +
+        //     getToken(),
+        //   "_blank"
+        // );
+        await $buyBook({
+          bookId: bookId,
+          orderNum: this.order.orderNum,
+        }).then((res) => {
+          let newWindow = window.open("", "_blank");
+          newWindow.document.open();
+          newWindow.document.write(res);
+          newWindow.document.close();
+        });
       }
     },
     getCommonList() {

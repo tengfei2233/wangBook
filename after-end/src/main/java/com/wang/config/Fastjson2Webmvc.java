@@ -32,7 +32,7 @@ public class Fastjson2Webmvc implements WebMvcConfigurer {
         config.setDateFormat("yyyy-MM-dd HH:mm:ss");
         config.setWriterFeatures(
                 //long 转 string 丢失精度问题
-                JSONWriter.Feature.WriteLongAsString,
+                JSONWriter.Feature.BrowserCompatible,
                 // 保留map空的字段
                 JSONWriter.Feature.WriteMapNullValue,
                 //将List类型的null转成[]
@@ -49,6 +49,15 @@ public class Fastjson2Webmvc implements WebMvcConfigurer {
         fastJsonHttpMessageConverter.setFastJsonConfig(config);
         converters.add(0, fastJsonHttpMessageConverter);
     }
+
+    /*
+
+     */
+    //
+    /**
+     *
+     * @param registry
+     */
 
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {

@@ -59,9 +59,9 @@ public class UserBookController {
     }
 
     @ApiOperation("购买书籍")
-    @GetMapping(value = "/buyBook")
-    public String buyBook(AddOrderBo bo, String token) {
-        return bookService.buyBook(bo, token);
+    @GetMapping( "/buyBook")
+    public String buyBook(AddOrderBo bo) {
+        return bookService.buyBook(bo);
     }
 
 

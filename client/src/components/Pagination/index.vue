@@ -21,6 +21,7 @@ import { scrollTo } from "./scroll-to";
 export default {
   name: "Pagination",
   props: {
+    // TODO: 此处注意total类型的转换，可能Number，也可能String
     total: {
       required: true,
       type: Number,

@@ -6,19 +6,18 @@ import com.wang.pojo.bo.LoginBo;
 import com.wang.pojo.bo.PhoneLoginBo;
 import com.wang.pojo.bo.UserRegisterBo;
 import com.wang.service.user.UserLoginService;
-import com.wang.utils.CaptchaUtil;
-import com.wang.utils.R;
-import com.wang.utils.RedisKey;
-import com.wang.utils.RedisUtil;
+import com.wang.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author feige
@@ -54,8 +53,8 @@ public class UserLoginController {
 
     @ApiOperation("获取验证码")
     @GetMapping("/getCaptcha")
-    public R<Object> getCaptcha() {
-        String uuid = UUID.randomUUID().toString();
+    public R<Object> getCaptcha(HttpServletRequest request) throws NoSuchAlgorithmException {
+        String uuid = getMD5(ServletUtil.getIP(request));
         // 四位数随机验证码
         CodeGenerator generator = CaptchaUtil.getCodeGenerator(4);
         AbstractCaptcha captchaDrawer = CaptchaUtil.getCaptchaDrawer();
@@ -80,7 +79,19 @@ public class UserLoginController {
     @ApiOperation("注册")
     @PostMapping("/register")
     public R<Void> register(@RequestBody UserRegisterBo bo) {
-        return loginService.register(bo)?R.ok("注册成功"):R.fail("注册失败");
+        return loginService.register(bo) ? R.ok("注册成功") : R.fail("注册失败");
+    }
+
+    private String getMD5(String str) throws NoSuchAlgorithmException {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        byte[] digest = md5.digest(str.getBytes());
+        // 将字节数组转换为十六进制表示
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest) {
+            sb.append(String.format("%02x", b));
+        }
+
+        return sb.toString();
     }
 
 }
