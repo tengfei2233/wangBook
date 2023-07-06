@@ -5,8 +5,14 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.domain.AlipayTradePrecreateModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradePrecreateRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -206,20 +212,53 @@ public class UserBookServiceImpl implements UserBookService {
 
     @Override
     public String buyBook(AddOrderBo bo) {
+        Map<String, String> params = generateOrderInfo(bo);
+        // TODO 支付宝付款
+        return sendRequestToAlipay(params.get("orderId"), params.get("orderPrice"), params.get("orderName"));
+    }
+
+    @Override
+    public QrcodeVo scanBuyBook(AddOrderBo bo) throws AlipayApiException {
+        Map<String, String> params = generateOrderInfo(bo);
+        //设置请求参数
+        AlipayTradePrecreateRequest alipayRequest = new AlipayTradePrecreateRequest();
+        alipayRequest.setReturnUrl(alipayProperties.getReturnUrl());
+        alipayRequest.setNotifyUrl(alipayRequest.getNotifyUrl());
+        AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
+        model.setOutTradeNo(params.get("orderId"));
+        model.setTotalAmount(params.get("orderPrice"));
+        model.setSubject(params.get("orderName"));
+        model.setQrCodeTimeoutExpress("60m");
+        alipayRequest.setBizModel(model);
+        // 执行
+        AlipayTradePrecreateResponse response = alipayClient.execute(alipayRequest);
+        if (!response.isSuccess()) {
+            throw new BookException("支付异常，请联系管理员");
+        }
+        log.info("响应体信息：{}", response.getBody());
+        log.info("交易订单号outTradeNo：{} ", response.getOutTradeNo());
+        log.info("支付二维码qrCode：{} ", response.getQrCode());
+        QrcodeVo qrcodeVo = new QrcodeVo();
+        qrcodeVo.setQrcode(response.getQrCode());
+        qrcodeVo.setOrderId(response.getOutTradeNo());
+        return qrcodeVo;
+    }
+
+    private Map<String, String> generateOrderInfo(AddOrderBo bo) {
         Long userId = SecurityUtil.getUserId();
         if (ObjUtil.isNull(userId)) {
-            return "请登录";
+            throw new BookException("请登录");
         }
         if (ObjectUtil.isNull(bo)) {
-            return "请传入非空信息";
+            throw new BookException("请传入非空信息");
         }
         Book book = bookMapper.selectOne(new LambdaQueryWrapper<Book>()
                 .eq(Book::getBookId, bo.getBookId()));
         if (ObjectUtil.isNull(book) || book.getStatus().intValue() == 0) {
-            return "该书籍已下架";
+            throw new BookException("该书籍已下架");
         }
         if (book.getBookStock() - bo.getOrderNum() < 0) {
-            return "书籍库存不够了";
+            throw new BookException("书籍库存不够了");
         }
         // TODO 构造订单
         Order order = new Order();
@@ -238,8 +277,12 @@ public class UserBookServiceImpl implements UserBookService {
         bookMapper.update(null, new LambdaUpdateWrapper<Book>()
                 .eq(Book::getBookId, book.getBookId())
                 .set(Book::getBookStock, book.getBookStock() - bo.getOrderNum()));
-        // TODO 支付宝付款
-        return sendRequestToAlipay(Long.toString(order.getOrderId()), price.toPlainString(), book.getBookName());
+
+        Map<String, String> params = new HashMap<>();
+        params.put("orderId", Long.toString(order.getOrderId()));
+        params.put("orderName", book.getBookName());
+        params.put("orderPrice", price.toPlainString());
+        return params;
     }
 
 
@@ -277,6 +320,7 @@ public class UserBookServiceImpl implements UserBookService {
     /**
      * 同步回调
      * TODO 订单状态更改不能在同步回调中执行
+     *
      * @param response
      * @throws IOException
      */
@@ -288,6 +332,7 @@ public class UserBookServiceImpl implements UserBookService {
     /**
      * 异步回调
      * TODO 订单状态更改在异步回调中执行
+     *
      * @param request
      * @return
      * @throws AlipayApiException
@@ -317,6 +362,82 @@ public class UserBookServiceImpl implements UserBookService {
             }
         } else {
             return "no";
+        }
+    }
+
+    @Override
+    public OrderInfoVo queryOrder(String orderId) throws AlipayApiException {
+        if (ObjUtil.isNull(orderId)) {
+            throw new BookException("商品订单为空");
+        }
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+        model.setOutTradeNo(orderId);
+        request.setBizModel(model);
+        AlipayTradeQueryResponse response = alipayClient.execute(request);
+        /*
+        0：交易不存在
+        1：创建交易，等待付款
+        2：交易超时
+        3：交易成功
+        4：交易成功，不可退款
+         */
+        int res = 0;
+        OrderInfoVo orderInfoVo = new OrderInfoVo();
+        if (response.getCode().equals("10000")) {
+            switch (response.getTradeStatus()) {
+                case "WAIT_BUYER_PAY":
+                    res = 1;
+                    break;
+                case "TRADE_CLOSED":
+                    res = 2;
+                    break;
+                case "TRADE_SUCCESS":
+                    res = 3;
+                    break;
+                default:
+                    res = 4;
+            }
+            orderInfoVo.setAlipayId(response.getTradeNo());
+            orderInfoVo.setOrderId(response.getOutTradeNo());
+            orderInfoVo.setBuyDate(response.getSendPayDate());
+        }
+        orderInfoVo.setOrderStatus(res);
+
+        return orderInfoVo;
+    }
+
+    @Override
+    public void updateOrder(String orderId) {
+        if (ObjUtil.isNull(orderId)) {
+            throw new BookException("商品订单为空");
+        }
+        Order order = orderMapper.selectOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderId, Long.parseLong(orderId)));
+        if (ObjUtil.isNotNull(order)) {
+            if (order.getStatus() == 0) {
+                // 已创建订单，是否付款
+                try {
+                    OrderInfoVo orderInfoVo = this.queryOrder(orderId);
+                    if (orderInfoVo.getOrderStatus() != 0 && orderInfoVo.getOrderStatus() != 2) {
+                        // 已付款，更改状态
+                        orderMapper.update(null, new LambdaUpdateWrapper<Order>()
+                                .set(Order::getBuyDate, orderInfoVo.getBuyDate())
+                                .set(Order::getAlipayNo, orderInfoVo.getAlipayId())
+                                .set(Order::getStatus, 1)
+                                .eq(Order::getOrderId, orderInfoVo.getOrderId()));
+                    } else {
+                        // 未付款，删除订单
+                        // TODO 可能存在用户一付款就关闭二维码的情景
+                        orderMapper.delete(new LambdaUpdateWrapper<Order>()
+                                .eq(Order::getOrderId, orderId)
+                        );
+                    }
+
+                } catch (AlipayApiException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 

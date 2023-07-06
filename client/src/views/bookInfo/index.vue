@@ -199,6 +199,23 @@
         </div>
       </div>
     </el-card>
+
+    <el-dialog title="提示" :visible.sync="payType" width="20%">
+      <span>采用扫码支付还是网页支付</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="scanPay">扫码支付</el-button>
+        <el-button type="primary" @click="webPay">网页支付</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      title="请使用支付宝扫码支付"
+      :visible.sync="qrCode"
+      width="300px"
+      @close="scanClose"
+    >
+      <div ref="qrcodeCanvas"></div>
+    </el-dialog>
   </div>
 </template>
 
@@ -209,14 +226,18 @@ import {
   $commonList,
   $toComment,
   $buyBook,
+  $scanBuyBook,
+  $queryOrder,
+  $updateOrder,
 } from "@/api/book";
-import { getToken } from "@/utils/auth";
+import QRCode from "qrcodejs2";
 export default {
   name: "bookInfo",
   data() {
     return {
       bookId: undefined,
       book: [],
+      orderId: undefined,
       order: {
         orderNum: 1,
         bookId: undefined,
@@ -238,6 +259,9 @@ export default {
         show: false,
         placeholder: "输入您的评论",
       },
+      payType: false,
+      qrCode: false,
+      timer: null,
     };
   },
   created() {
@@ -279,25 +303,20 @@ export default {
         });
       }
     },
-    async toBuy(bookId) {
+    toBuy(bookId) {
+      this.order.bookId = bookId;
+      this.payType = true;
+    },
+    // 网页支付
+    async webPay() {
       if (
         this.order.orderNum < 0 ||
         this.order.orderNum > this.book.bookStock
       ) {
         this.$notify.warning("库存不足");
       } else {
-        this.order.bookId = bookId;
-        // window.open(
-        //   "http://localhost:8888/user/book/buyBook?bookId=" +
-        //     bookId +
-        //     "&orderNum=" +
-        //     this.order.orderNum +
-        //     "&token=" +
-        //     getToken(),
-        //   "_blank"
-        // );
         await $buyBook({
-          bookId: bookId,
+          bookId: this.order.bookId,
           orderNum: this.order.orderNum,
         }).then((res) => {
           let newWindow = window.open("", "_blank");
@@ -305,7 +324,47 @@ export default {
           newWindow.document.write(res);
           newWindow.document.close();
         });
+        this.payType = false;
       }
+    },
+    // 扫码支付
+    scanPay() {
+      $scanBuyBook({
+        bookId: this.order.bookId,
+        orderNum: this.order.orderNum,
+      }).then((res) => {
+        res=res.data;
+        this.qrCode = true;
+        this.orderId=res.orderId;
+        this.$nextTick(() => {
+          const canvas = this.$refs.qrcodeCanvas;
+          new QRCode(canvas, {
+            text: res.qrcode, // 需要转换为二维码的内容
+            width: 150,
+            height: 150,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H,
+          });
+          this.timerQuery();
+        });
+      });
+      this.payType = false;
+    },
+    timerQuery() {
+      // 轮询查询订单状态
+      this.timer = setInterval(() => {
+        $queryOrder(this.orderId).then((res) => {
+          console.log("状态：", res);
+        });
+      }, 2000);
+    },
+    scanClose() {
+      console.log("关闭扫码框");
+      clearInterval(this.timer);
+      this.$refs.qrcodeCanvas.innerHTML = "";
+      // 跟新订单列表
+      $updateOrder(this.orderId);
     },
     getCommonList() {
       $commonList(this.params).then((res) => {

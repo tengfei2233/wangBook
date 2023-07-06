@@ -59,16 +59,36 @@ public class UserBookController {
     }
 
     @ApiOperation("购买书籍")
-    @GetMapping( "/buyBook")
+    @GetMapping("/buyBook")
     public String buyBook(AddOrderBo bo) {
         return bookService.buyBook(bo);
+    }
+
+    @ApiOperation("扫码购买书籍")
+    @GetMapping("/scanBuy")
+    public R<QrcodeVo> scanBuyBook(AddOrderBo bo) throws AlipayApiException {
+        return R.ok("请求成功", bookService.scanBuyBook(bo));
+    }
+
+    @ApiOperation("查询订单信息")
+    @GetMapping("/queryOrder")
+    public OrderInfoVo queryOrder(@RequestParam("orderId") @ApiParam("订单id")
+                                  String orderId) throws AlipayApiException {
+        return bookService.queryOrder(orderId);
+    }
+
+    @ApiOperation("更改订单信息")
+    @PostMapping("/updateOrder")
+    public void updateOrder(@RequestParam("orderId") @ApiParam("订单id")
+                            String orderId) throws AlipayApiException {
+        bookService.updateOrder(orderId);
     }
 
 
     @ApiOperation("付款成功同步回调")
     @GetMapping("/syncNotify")
-    public void returnUrl( HttpServletResponse response) throws AlipayApiException, IOException {
-        bookService.returnUrl( response);
+    public void returnUrl(HttpServletResponse response) throws AlipayApiException, IOException {
+        bookService.returnUrl(response);
     }
 
     @ApiOperation("付款成功异步回调")

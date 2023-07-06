@@ -44,4 +44,10 @@ public interface UserBookService {
     Boolean delOrder(Long orderId);
 
     String notifyUrl(HttpServletRequest request)throws AlipayApiException, IOException;
+
+    QrcodeVo scanBuyBook(AddOrderBo bo) throws AlipayApiException;
+
+    OrderInfoVo queryOrder(String orderId) throws AlipayApiException;
+
+    void updateOrder(String orderId);
 }

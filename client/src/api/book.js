@@ -35,10 +35,42 @@ export function $addCar(data) {
     })
 }
 
-// 购买
+// 网页购买
 export function $buyBook(params) {
     return request({
         url: '/book/buyBook',
+        method: 'get',
+        params
+    })
+}
+
+// 查询订单信息
+export function $queryOrder(orderId) {
+    return request({
+        url: '/book/queryOrder',
+        method: 'get',
+        params:{
+            orderId:orderId
+        }
+    })
+}
+
+// 查询订单信息
+export function $updateOrder(orderId) {
+    return request({
+        url: '/book/updateOrder',
+        method: 'post',
+        params:{
+            orderId:orderId
+        }
+    })
+}
+
+
+// 扫码购买
+export function $scanBuyBook(params) {
+    return request({
+        url: '/book/scanBuy',
         method: 'get',
         params
     })
