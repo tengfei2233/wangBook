@@ -4,6 +4,7 @@
 **/logs
 **/target
 **/*.iml
+after-end/src/main/resources/ali*.properties
 
 ## 前端
 **/node_modules
