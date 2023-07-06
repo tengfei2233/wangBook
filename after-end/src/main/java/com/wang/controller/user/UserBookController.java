@@ -67,8 +67,14 @@ public class UserBookController {
 
     @ApiOperation("付款成功同步回调")
     @GetMapping("/syncNotify")
-    public void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException {
-        bookService.returnUrl(request, response);
+    public void returnUrl( HttpServletResponse response) throws AlipayApiException, IOException {
+        bookService.returnUrl( response);
+    }
+
+    @ApiOperation("付款成功异步回调")
+    @PostMapping("/asyncNotify")
+    public String notifyUrl(HttpServletRequest request) throws AlipayApiException, IOException {
+        return bookService.notifyUrl(request);
     }
 
     @ApiOperation("购物车列表")

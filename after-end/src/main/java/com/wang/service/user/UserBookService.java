@@ -33,7 +33,7 @@ public interface UserBookService {
 
     String buyBook(AddOrderBo bo);
 
-    void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException;
+    void returnUrl( HttpServletResponse response) throws AlipayApiException, IOException;
 
     PageData<OrderVo> orderList(PageQuery pageQuery);
 
@@ -42,4 +42,6 @@ public interface UserBookService {
     Boolean delCar(Long id);
 
     Boolean delOrder(Long orderId);
+
+    String notifyUrl(HttpServletRequest request)throws AlipayApiException, IOException;
 }

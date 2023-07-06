@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -22,7 +21,6 @@ import com.wang.pojo.bo.CommentBo;
 import com.wang.pojo.bo.PageQuery;
 import com.wang.pojo.vo.*;
 import com.wang.service.user.UserBookService;
-import com.wang.utils.JwtUtil;
 import com.wang.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -63,7 +61,7 @@ public class UserBookServiceImpl implements UserBookService {
     @Resource
     private CarMapper carMapper;
     @Resource
-    private JwtUtil jwtUtil;
+    private AlipayClient alipayClient;
 
     @Override
     public List<TypeVo> getTypeList() {
@@ -208,7 +206,7 @@ public class UserBookServiceImpl implements UserBookService {
 
     @Override
     public String buyBook(AddOrderBo bo) {
-        Long userId  = SecurityUtil.getUserId();
+        Long userId = SecurityUtil.getUserId();
         if (ObjUtil.isNull(userId)) {
             return "请登录";
         }
@@ -254,10 +252,6 @@ public class UserBookServiceImpl implements UserBookService {
      * @return
      */
     private String sendRequestToAlipay(String outTradeNo, String totalAmount, String subject) {
-        //获得初始化的AlipayClient
-        AlipayClient alipayClient = new DefaultAlipayClient(alipayProperties.getGatewayUrl(), alipayProperties.getAppId(), alipayProperties.getAppPrivateKey(),
-                "JSON", "UTF-8", alipayProperties.getAlipayPublicKey(), alipayProperties.getSignType());
-
         //设置请求参数
         AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
         alipayRequest.setReturnUrl(alipayProperties.getReturnUrl());
@@ -282,13 +276,25 @@ public class UserBookServiceImpl implements UserBookService {
 
     /**
      * 同步回调
-     *
-     * @param request
+     * TODO 订单状态更改不能在同步回调中执行
      * @param response
      * @throws IOException
      */
-    public void returnUrl(HttpServletRequest request, HttpServletResponse response) throws AlipayApiException, IOException {
+    public void returnUrl(HttpServletResponse response) throws AlipayApiException, IOException {
         log.info("=================================同步回调=====================================");
+        response.sendRedirect(alipayProperties.getRedirectUrl());
+    }
+
+    /**
+     * 异步回调
+     * TODO 订单状态更改在异步回调中执行
+     * @param request
+     * @return
+     * @throws AlipayApiException
+     */
+    @Override
+    public String notifyUrl(HttpServletRequest request) throws AlipayApiException {
+        log.info("=================================异步回调=====================================");
         // TODO 进行相应的操作
         Map<String, String> params = new HashMap<>();
         Map<String, String[]> requestParams = request.getParameterMap();
@@ -304,8 +310,14 @@ public class UserBookServiceImpl implements UserBookService {
                     .set(Order::getAlipayNo, params.get("trade_no"))
                     .set(Order::getStatus, 1)
                     .eq(Order::getOrderId, params.get("out_trade_no")));
+            if (res >= 1) {
+                return "ok";
+            } else {
+                return "no";
+            }
+        } else {
+            return "no";
         }
-        response.sendRedirect("http://localhost:88/orders");
     }
 
     @Override

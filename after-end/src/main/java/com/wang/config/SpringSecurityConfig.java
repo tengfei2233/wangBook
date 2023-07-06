@@ -77,7 +77,7 @@ public class SpringSecurityConfig {
                         // swagger
                         .antMatchers("/favicon.ico", "/doc.html", "/webjars/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
                         // 支付
-                        .antMatchers("/user/book/syncNotify").permitAll()
+                        .antMatchers("/user/book/syncNotify","/user/book/asyncNotify").permitAll()
                         // 方形接口（具体匹配接口放上面，防止匹配顺序问题）
                         .antMatchers("/user/login/**", "/manage/login/login").permitAll()
                         // 普通用户接口 TODO hasRole会给权限字符串加上 ROLE_ 前缀，hasAuthority不会

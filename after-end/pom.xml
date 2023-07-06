@@ -69,11 +69,11 @@
             <version>3.0.3</version>
         </dependency>
 
-        <!-- 支付宝模拟支付SDK -->
+        <!-- 支付宝模拟支付SDK，4.34.0以前存在fastjson漏洞 -->
         <dependency>
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
-            <version>4.16.2.ALL</version>
+            <version>4.34.0.ALL</version>
         </dependency>
 
         <!-- fastjson2 -->
