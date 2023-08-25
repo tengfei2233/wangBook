@@ -24,6 +24,7 @@ import java.util.List;
 public class Fastjson2Webmvc implements WebMvcConfigurer {
 
     // TODO 参看博客 https://tengfei2233.gitee.io/2023/6/15/Jackson%E8%A7%A3%E5%86%B3SpringMVC%E5%85%A8%E5%B1%80%E5%BA%8F%E5%88%97%E5%8C%96%E8%BF%94%E5%9B%9E%E4%B8%ADLong%E7%B1%BB%E5%9E%8B%E7%B2%BE%E5%BA%A6%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98/
+    // 消息转化器
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
@@ -50,15 +51,8 @@ public class Fastjson2Webmvc implements WebMvcConfigurer {
         converters.add(0, fastJsonHttpMessageConverter);
     }
 
-    /*
 
-     */
-    //
-    /**
-     *
-     * @param registry
-     */
-
+    // 视图解析器
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         FastJsonJsonView fastJsonJsonView = new FastJsonJsonView();
