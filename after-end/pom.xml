@@ -47,6 +47,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- mybatis-plus -->
@@ -131,17 +132,22 @@
         </plugins>
     </build>
 
-    <!--    <repositories>-->
-    <!--        <repository>-->
-    <!--            <id>thinkgem-repos2</id>-->
-    <!--            <name>ThinkGem Repository 2</name>-->
-    <!--            <url>https://raw.github.com/thinkgem/repository/master</url>-->
-    <!--        </repository>-->
-    <!--        <repository>-->
-    <!--            <id>central-repos1</id>-->
-    <!--            <name>Central Repository 2</name>-->
-    <!--            <url>http://repo1.maven.org/maven2/</url>-->
-    <!--        </repository>-->
-    <!--    </repositories>-->
+    <!-- 远程仓库地址 -->
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <name>Aliyun Maven Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+    </repositories>
+
+    <!-- 远程插件仓库地址 -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>aliyun</id>
+            <name>Aliyun Maven Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
