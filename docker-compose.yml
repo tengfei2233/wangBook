@@ -1,0 +1,76 @@
+# 版本
+version: '1.0.0'
+
+# 服务列表 
+services:
+  # 后端
+  after-end:
+    build:
+      cotext: ./after-end
+      dockerfile: Dockerfile
+    container_name: after-end
+    ports:
+      - 8080:8888
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - db
+
+  # 前端用户端
+  front-client:
+    build: ./client
+    container_name: front-client
+    ports:
+      - 81:80
+    volumes:
+      - /data/wangbook/nginx-client/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /data/wangbook/nginx-client/html:/usr/share/nginx/html
+    networks:
+      - frontend
+
+  # 前端管理端
+  front-manage:
+    build: ./manage
+    container_name: front-manage
+    ports:
+      - 82:80
+    volumes:
+      - /data/wangbook/nginx-manage/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /data/wangbook/nginx-manage/html:/usr/share/nginx/html
+    networks:
+      - frontend
+
+  # 数据库
+  db:
+    image: mysql:8.0.22
+    container_name: mysql8
+    ports:
+      -3306:3306
+    volumes:
+      - /data/wangbook/mysql/log:/var/log/mysql
+      - /data/wangbook/mysql/data:/var/lib/mysql
+      - /data/wangbook/mysql/conf:/etc/mysql/conf.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    networks:
+      - backend
+  
+  # redis缓存
+  cache:
+    image: redis:6.2.12
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/wangbook/redis/data:/data
+      - /data/wangbook/redis/conf/redis.conf:/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+
+
+
