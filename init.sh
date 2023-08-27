@@ -53,7 +53,7 @@ http {
         server_name  localhost;
 
         location / {
-            root html;
+            root /usr/share/nginx/html;
             index  index.html index.htm;
             try_files \$uri \$uri/ /index.html;
         }
@@ -113,7 +113,7 @@ http {
         server_name  localhost;
 
         location / {
-            root html;
+            root /usr/share/nginx/html;
             index  index.html index.htm;
             try_files \$uri \$uri/ /index.html;
         }
