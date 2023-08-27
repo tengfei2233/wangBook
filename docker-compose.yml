@@ -46,7 +46,7 @@ services:
     image: mysql:8.0.22
     container_name: mysql8
     ports:
-      -3306:3306
+      - 3306:3306
     volumes:
       - /data/wangbook/mysql/log:/var/log/mysql
       - /data/wangbook/mysql/data:/var/lib/mysql
