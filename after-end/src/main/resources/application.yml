@@ -8,13 +8,13 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.2.129/old_book?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+    url: jdbc:mysql://mysql8:3306/wang_book?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
     username: root
-    password: "000000"
+    password: 123456
   redis:
     port: 6379
-    host: 192.168.2.129
-    password: aaaaaa
+    host: redis6
+    password: 123456
 
 
 # 必须有，以下配置文件，knife4j插件自动获取
