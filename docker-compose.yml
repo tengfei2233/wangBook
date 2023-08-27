@@ -27,7 +27,6 @@ services:
       - 81:80
     volumes:
       - /data/wangbook/nginx-client/conf/nginx.conf:/etc/nginx/nginx.conf
-      - /data/wangbook/nginx-client/html:/usr/share/nginx/html
     networks:
       - frontend
     # 依赖于after-end服务
@@ -42,7 +41,6 @@ services:
       - 82:80
     volumes:
       - /data/wangbook/nginx-manage/conf/nginx.conf:/etc/nginx/nginx.conf
-      - /data/wangbook/nginx-manage/html:/usr/share/nginx/html
     networks:
       - frontend
     # 依赖于after-end服务
