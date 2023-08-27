@@ -6,7 +6,7 @@ services:
   # 后端
   after-end:
     build:
-      cotext: ./after-end
+      context: ./after-end
       dockerfile: Dockerfile
     container_name: after-end
     ports:
@@ -16,6 +16,7 @@ services:
       - backend
     depends_on:
       - db
+      - cache
 
   # 前端用户端
   front-client:
@@ -28,6 +29,8 @@ services:
       - /data/wangbook/nginx-client/html:/usr/share/nginx/html
     networks:
       - frontend
+    depends_on:
+      - after-end
 
   # 前端管理端
   front-manage:
@@ -40,6 +43,8 @@ services:
       - /data/wangbook/nginx-manage/html:/usr/share/nginx/html
     networks:
       - frontend
+    depends_on:
+      - after-end
 
   # 数据库
   db:
