@@ -35,9 +35,9 @@ http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                      '\$status \$body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for"';
 
     access_log  /var/log/nginx/access.log  main;
 
@@ -55,13 +55,13 @@ http {
         location / {
             root html;
             index  index.html index.htm;
-            try_files $uri $uri/ /index.html;
+            try_files \$uri \$uri/ /index.html;
         }
 
         # nginx代理
         location /api {
-                # 将/api替换成空，$1表示(.*)
-                rewrite  ^/api/(.*)$ /uesr/$1 break;
+                # 将/api替换成空，\$1表示(.*)
+                rewrite  ^/api/(.*)$ /uesr/\$1 break;
                 # 连接到后端docker容器
                 proxy_pass http://after-end:8080;
         }
@@ -95,9 +95,9 @@ http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                      '$status $body_bytes_sent "$http_referer" '
-                      '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                      '\$status \$body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for"';
 
     access_log  /var/log/nginx/access.log  main;
 
@@ -115,13 +115,13 @@ http {
         location / {
             root html;
             index  index.html index.htm;
-            try_files $uri $uri/ /index.html;
+            try_files \$uri \$uri/ /index.html;
         }
 
         # nginx代理
         location /api {
-                # 将/api替换成空，$1表示(.*)
-                rewrite  ^/api/(.*)$ /manage/$1 break;
+                # 将/api替换成空，\$1表示(.*)
+                rewrite  ^/api/(.*)$ /manage/\$1 break;
                 # 连接到后端docker容器
                 proxy_pass http://after-end:8080;
         }
