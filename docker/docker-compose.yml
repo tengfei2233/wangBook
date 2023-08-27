@@ -9,6 +9,8 @@ services:
     build:
       context: ../after-end
       dockerfile: Dockerfile
+    # 指定构建生成的镜像的名称，与build指令一起存在的话，这个image就是指定构建好镜像的名称以及标签
+    image: after-end:v1.0
     # 指定容器名称为after-end
     container_name: after-end
     ports:
@@ -25,6 +27,7 @@ services:
   # 前端用户端
   front-client:
     build: ../client
+    image: front-client:v1.0
     container_name: front-client
     ports:
       - 81:80
@@ -39,6 +42,7 @@ services:
   # 前端管理端
   front-manage:
     build: ../manage
+    image: front-manage:v1.0
     container_name: front-manage
     ports:
       - 82:80
@@ -52,7 +56,7 @@ services:
 
   # 数据库
   db:
-    # 依赖镜像创建容器
+    # 依赖镜像创建容器，当镜像不存在时，便从远程下载
     image: mysql:8.0.22
     container_name: mysql8
     ports:
