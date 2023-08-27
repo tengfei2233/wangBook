@@ -48,18 +48,23 @@ http {
 
     gzip  on;
 
-    location / {
-        root html;
-        index  index.html index.htm;
-        try_files $uri $uri/ /index.html;
-    }
+    server {
+        listen       80;
+        server_name  localhost;
 
-    # nginx代理
-    location /api {
-            # 将/api替换成空，$1表示(.*)
-            rewrite  ^/api/(.*)$ /uesr/$1 break;
-            # 连接到后端docker容器
-            proxy_pass http://after-end:8080;
+        location / {
+            root html;
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;
+        }
+
+        # nginx代理
+        location /api {
+                # 将/api替换成空，$1表示(.*)
+                rewrite  ^/api/(.*)$ /uesr/$1 break;
+                # 连接到后端docker容器
+                proxy_pass http://after-end:8080;
+        }
     }
 
 }
@@ -103,18 +108,23 @@ http {
 
     gzip  on;
 
-    location / {
-        root html;
-        index  index.html index.htm;
-        try_files $uri $uri/ /index.html;
-    }
+    server {
+        listen       80;
+        server_name  localhost;
 
-    # nginx代理
-    location /api {
-            # 将/api替换成空，$1表示(.*)
-            rewrite  ^/api/(.*)$ /manage/$1 break;
-            # 连接到后端docker容器
-            proxy_pass http://after-end:8080;
+        location / {
+            root html;
+            index  index.html index.htm;
+            try_files $uri $uri/ /index.html;
+        }
+
+        # nginx代理
+        location /api {
+                # 将/api替换成空，$1表示(.*)
+                rewrite  ^/api/(.*)$ /manage/$1 break;
+                # 连接到后端docker容器
+                proxy_pass http://after-end:8080;
+        }
     }
 
 }
