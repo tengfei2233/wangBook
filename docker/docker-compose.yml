@@ -5,12 +5,15 @@ version: '1.0.0'
 services:
   # 后端
   after-end:
+    # 根据该目录下的Dockerfile构建
     build:
       context: ../after-end
       dockerfile: Dockerfile
+    # 指定容器名称为after-end
     container_name: after-end
     ports:
       - 8080:8888
+    # 关联的网络
     networks:
       - frontend
       - backend
@@ -35,12 +38,12 @@ services:
 
   # 前端管理端
   front-manage:
-    build: ./manage
+    build: ../manage
     container_name: front-manage
     ports:
       - 82:80
     volumes:
-      - /nginx/manage/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/manage/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - frontend
     # 依赖于after-end服务
@@ -49,6 +52,7 @@ services:
 
   # 数据库
   db:
+    # 依赖镜像创建容器
     image: mysql:8.0.22
     container_name: mysql8
     ports:
@@ -76,6 +80,7 @@ services:
     networks:
       - backend
 
+# 自定义docker网络
 networks:
   frontend:
   backend:
