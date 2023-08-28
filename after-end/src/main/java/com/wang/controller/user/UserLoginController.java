@@ -64,7 +64,7 @@ public class UserLoginController {
         // 将验证码存储起来，存储两分钟
         redisUtil.set(RedisKey.CAPTCHA_KEY + uuid, code, 2);
         Map<String, Object> map = new HashMap<>();
-        map.put("uuid：{}", uuid);
+        map.put("uuid：", uuid);
         map.put("captcha", captchaDrawer.getImageBase64Data());
         return R.ok("请求成功", map);
     }
