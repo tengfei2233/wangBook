@@ -13,8 +13,10 @@ services:
     image: after-end:v1.0
     # 指定容器名称为after-end
     container_name: after-end
+    # 因为都连接到了docker定义的网络，通过容器名:port进行访问容器，所以不用暴露端口也行
+    # 这里暴漏端口是为了逻辑清洗
     ports:
-      - 8080:8888
+      - 8888:8888
     # 关联的网络
     networks:
       - frontend
