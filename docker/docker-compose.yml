@@ -62,7 +62,7 @@ services:
     image: mysql:8.0.22
     container_name: mysql8
     ports:
-      - 3306:3306
+      - 4406:3306
     volumes:
       - ./mysql/log:/var/log/mysql
       - ./mysql/data:/var/lib/mysql
@@ -82,7 +82,7 @@ services:
       - ./redis/data:/data
       - ./redis/conf/redis.conf:/etc/redis/redis.conf
     ports:
-      - 6379:6379
+      - 7379:6379
     networks:
       - backend
 
