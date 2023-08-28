@@ -10,6 +10,7 @@ import com.wang.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @description
  */
 
+@Slf4j
 @RestController
 @Api(tags = {"用户登录控制器"})
 @RequestMapping("/user/login")
@@ -55,12 +57,14 @@ public class UserLoginController {
     @GetMapping("/getCaptcha")
     public R<Object> getCaptcha(HttpServletRequest request) throws NoSuchAlgorithmException {
         String uuid = getMD5(ServletUtil.getIP(request));
+        log.info("uuid：",uuid);
         // 四位数随机验证码
         CodeGenerator generator = CaptchaUtil.getCodeGenerator(4);
         AbstractCaptcha captchaDrawer = CaptchaUtil.getCaptchaDrawer();
         captchaDrawer.setGenerator(generator);
         captchaDrawer.createCode();
         String code = captchaDrawer.getCode();
+        log.info("code：",code);
         // 将验证码存储起来，存储两分钟
         redisUtil.set(RedisKey.CAPTCHA_KEY + uuid, code, 2);
         Map<String, Object> map = new HashMap<>();
