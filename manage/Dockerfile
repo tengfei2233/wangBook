@@ -2,11 +2,6 @@
 # 分阶段构建一，安装依赖，打包代码
 FROM node:14.21.3-alpine3.16 as build
 
-# 指定容器元标签
-LABEL maintainer="tengfei"
-LABEL version="1.0.0"
-LABEL description="wangBook的用户端管理端"
-
 # 设置工作目录
 WORKDIR /app
 
@@ -21,6 +16,11 @@ RUN npm install --registry=https://registry.npm.taobao.org/ && \
 
 # 分阶段构建二，将打包好的代码带nginx上运行
 FROM nginx:1.22.1-alpine-slim
+
+# 指定容器元标签
+LABEL maintainer="tengfei"
+LABEL version="1.0.0"
+LABEL description="wangBook的用户端管理端"
 
 #拷贝打包好的文件到文件夹
 COPY --from=build /app/dist /usr/share/nginx/html
